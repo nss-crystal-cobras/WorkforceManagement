@@ -8,7 +8,6 @@ using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BangazonWorkforce.Controllers
 {
@@ -25,10 +24,10 @@ namespace BangazonWorkforce.Controllers
         {
             get
             {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                return new SqlConnection(connectionString);
             }
         }
-
         // GET: Employees
         public ActionResult Index()
         {
@@ -73,23 +72,42 @@ namespace BangazonWorkforce.Controllers
         // GET: Employees/Create
         public ActionResult Create()
         {
-            return View();
+            EmployeeCreateViewModel viewModel =
+                new EmployeeCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
         // POST: Employees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(EmployeeCreateViewModel model)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Employee
+                    ( FirstName, LastName, IsSupervisor, DepartmentId )
+                    VALUES
+                    ( @firstName, @lastName, @isSupervisor, @departmentId )";
+                        cmd.Parameters.Add(new SqlParameter("@firstName", model.Employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@lastName", model.Employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", model.Employee.IsSupervisor));
+                        cmd.Parameters.Add(new SqlParameter("@departmentId", model.Employee.DepartmentId));
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
-                return View();
+                model.Departments = GetAllDepartments();
+                return View(model);
             }
         }
 
