@@ -34,7 +34,7 @@ namespace BangazonWorkforce.Models.ViewModels
                         Departments.Add(new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("[Name]"))
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
                         });
                     }
                     reader.Close();
