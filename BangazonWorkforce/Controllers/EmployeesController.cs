@@ -7,7 +7,6 @@ using BangazonWorkforce.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace BangazonWorkforce.Controllers
 {
