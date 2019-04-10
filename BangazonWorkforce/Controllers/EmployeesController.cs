@@ -13,25 +13,54 @@ namespace BangazonWorkforce.Controllers
 {
     public class EmployeesController : Controller
     {
-        private readonly IConfiguration _config;
+        private readonly IConfiguration _configuration;
 
-        public EmployeesController(IConfiguration config)
+        public EmployeesController(IConfiguration configuration)
         {
-            _config = config;
+            this._configuration = configuration;
         }
 
         public SqlConnection Connection
         {
             get
             {
-                string connectionString = _config.GetConnectionString("DefaultConnection");
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
                 return new SqlConnection(connectionString);
             }
         }
         // GET: Employees
         public ActionResult Index()
         {
-            return View();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.Id AS EmployeeId,
+                                      e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor
+                                      FROM Employee e LEFT JOIN  Department d on d.id = e.DepartmentId;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Employee> employees = new List<Employee>();
+
+                    while (reader.Read())
+                    {
+                        Employee employee = new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                        };
+
+                        employees.Add(employee);
+                    }
+
+                    reader.Close();
+                    return View(employees);
+                }
+            }
         }
 
         // GET: Employees/Details/5
@@ -44,7 +73,7 @@ namespace BangazonWorkforce.Controllers
         public ActionResult Create()
         {
             EmployeeCreateViewModel viewModel =
-                new EmployeeCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+                new EmployeeCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
             return View(viewModel);
         }
 
@@ -135,7 +164,7 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Name from Department;";
+                    cmd.CommandText = @"SELECT Id, [Name] from Department;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Department> Departments = new List<Department>();
@@ -145,7 +174,7 @@ namespace BangazonWorkforce.Controllers
                         Departments.Add(new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                            Name = reader.GetString(reader.GetOrdinal("[Name]"))
                         });
                     }
                     reader.Close();
