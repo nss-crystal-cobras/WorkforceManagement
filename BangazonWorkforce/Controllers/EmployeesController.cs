@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforce.Models;
+using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -126,8 +127,8 @@ namespace BangazonWorkforce.Controllers
                         cmd.CommandText = @"UPDATE employee 
                                            SET firstname = @firstname, 
                                                lastname = @lastname,
-                                               isSuper = @isSupervisor, 
-                                               deptid = @departmentId
+                                               isSupervisor = @isSupervisor, 
+                                               departmentId = @departmentId
                                          WHERE id = @id;";
 
                         cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
@@ -180,14 +181,14 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT e.Id AS EmployeeId,
-                                               e.FirstName, 
-                                               e.LastName, 
-                                               e.IsSuper 
-                                               e.DeptId,
-                                               e.Name AS DeptName
-                                         FROM Employee e LEFT JOIN  d on e.departmentid = d.id
-                                         WHERE  e.Id = @id";
+                    cmd.CommandText = @"SELECT e.id, 
+                                               e.firstname, 
+                                               e.lastname,
+                                               e.issupervisor,
+                                               e.departmentid, 
+                                               d.name AS departmentname
+                                        FROM Employee e INNER JOIN Department d ON e.departmentid = d.id
+                                         WHERE  e.Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -197,15 +198,15 @@ namespace BangazonWorkforce.Controllers
                     {
                         employee = new Employee
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            Id = reader.GetInt32(reader.GetOrdinal("id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSuper")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DeptId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             Department = new Department
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                Name = reader.GetString(reader.GetOrdinal("CohortName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
+                                Name = reader.GetString(reader.GetOrdinal("departmentname")),
                             }
                         };
                     }
