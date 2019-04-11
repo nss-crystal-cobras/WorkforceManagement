@@ -62,81 +62,123 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
-/*
+
+        //==================================================================================================
+        //Hannah
+
+        // Ticket Instructions:
+//         1. First name and last name (of Employee)
+//        2. Department
+//        3. Currently assigned computer
+//        4. Training programs they have attended, or plan on attending (access the list of training programs associated with the employee)
+
+            //--(Query Training Program and Employee within EmployeeTraining(Query Department within Employee (Query computer within ComputerEmployee) ) )
+
         // GET: Employees/Details/5
         public ActionResult Details(int id)
         {
-            return View();
-        }
-
-        // GET: Employees/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Employees/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            using (SqlConnection conn = Connection)
             {
-                // TODO: Add insert logic here
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText @"SELECT 
+                    COALESCE(ce.EmployeeId, et.EmployeeId, e.Id) AS 'Employee Id',
+	e.FirstName,
+	e.LastName,
+	d.[Name] AS 'Department Name',
+	ce.AssignDate AS 'Computer Assigned On',
+	ce.ComputerId AS 'Computer Id',
+	--et.Id,
+	et.TrainingProgramId, 
+	tp.[Name] AS 'Training Program', 
+	tp.StartDate AS 'Training Program Start'
+FROM Employee AS e
+FULL OUTER JOIN EmployeeTraining AS et ON e.Id = et.EmployeeId
+INNER JOIN TrainingProgram AS tp ON tp.Id = et.TrainingProgramId
+FULL OUTER JOIN ComputerEmployee AS ce ON e.Id = ce.EmployeeId
+LEFT JOIN Department AS d ON d.Id = e.DepartmentId
+WHERE e.Id = @id";
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: Employees/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
 
-        // POST: Employees/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                    return View();
+                }
             }
         }
 
-        // GET: Employees/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
 
-        // POST: Employees/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
+        //==================================================================================================
+        /*
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-        */
+                // GET: Employees/Create
+                public ActionResult Create()
+                {
+                    return View();
+                }
+
+                // POST: Employees/Create
+                [HttpPost]
+                [ValidateAntiForgeryToken]
+                public ActionResult Create(IFormCollection collection)
+                {
+                    try
+                    {
+                        // TODO: Add insert logic here
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch
+                    {
+                        return View();
+                    }
+                }
+
+                // GET: Employees/Edit/5
+                public ActionResult Edit(int id)
+                {
+                    return View();
+                }
+
+                // POST: Employees/Edit/5
+                [HttpPost]
+                [ValidateAntiForgeryToken]
+                public ActionResult Edit(int id, IFormCollection collection)
+                {
+                    try
+                    {
+                        // TODO: Add update logic here
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch
+                    {
+                        return View();
+                    }
+                }
+
+                // GET: Employees/Delete/5
+                public ActionResult Delete(int id)
+                {
+                    return View();
+                }
+
+                // POST: Employees/Delete/5
+                [HttpPost]
+                [ValidateAntiForgeryToken]
+                public ActionResult Delete(int id, IFormCollection collection)
+                {
+                    try
+                    {
+                        // TODO: Add delete logic here
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch
+                    {
+                        return View();
+                    }
+                }
+                */
     }
 }
