@@ -72,7 +72,7 @@ namespace BangazonWorkforce.Controllers
 //        3. Currently assigned computer
 //        4. Training programs they have attended, or plan on attending (access the list of training programs associated with the employee)
 
-        // GET: Employees/Details/5
+        // GET: Employees/Details/{id}
         public ActionResult Details(int id)
         {
             using (SqlConnection conn = Connection)
@@ -95,11 +95,21 @@ namespace BangazonWorkforce.Controllers
                 INNER JOIN TrainingProgram AS tp ON tp.Id = et.TrainingProgramId
                 FULL OUTER JOIN ComputerEmployee AS ce ON e.Id = ce.EmployeeId
                 LEFT JOIN Department AS d ON d.Id = e.DepartmentId
-                WHERE e.Id = @id";
+                WHERE e.id = @id";
 
                     //NOTE: HMN: This query was tested in SQL and produced, overall, the desired results (based on issue ticket specifications) The List of training programs for employees (past and future) may need to be tweaked to show end date or past date, however.
 
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
 
+                    Employee employee = null;
+                    while (reader.Read())
+                    {
+                        //If employee = null, it doesn't exist; create an object for it.
+                        //An employee must have a department they work in (i.e., dept cannot be null).
+                        //An employee does not have to be enrolled in a training program but if they are, the training program type needs to show all past and future training programs for the employee.
+                        //An employee must have a computer (i.e., computer !== null).
+                    }
 
 
 
