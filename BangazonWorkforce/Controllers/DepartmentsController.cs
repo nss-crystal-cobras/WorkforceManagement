@@ -109,23 +109,20 @@ namespace BangazonWorkforce.Controllers
                             e.FirstName, 
                             e.LastName
                         FROM Department d 
-                        LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
+                        LEFT JOIN Employee e on e.DepartmentId = DepartmentId
+                        WHERE DepartmentId = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id)); 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Department department = null;
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
                         department = new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            EmployeeList = new List<Employee>()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            }
+                           
                         };
                     }
 
