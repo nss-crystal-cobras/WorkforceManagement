@@ -16,14 +16,14 @@ namespace BangazonWorkforce.Models
         public string Name { get; set; }
         [Required]
         public int Budget { get; set; }
-        public List<Employee> EmployeeIdList { get; set; } = new List<Employee>();
+        public List<Employee> EmployeeList { get; set; } = new List<Employee>();
 
         [Display(Name="Department Size")]
         public int EmployeeCount
         {
             get
             {
-                return EmployeeIdList.Count();
+                return EmployeeList.Count();
             }
         }
     }

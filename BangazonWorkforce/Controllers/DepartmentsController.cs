@@ -41,8 +41,14 @@ namespace BangazonWorkforce.Controllers
                 //join tables by department id within employee object to id within department object
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, d.[Name], d.Budget, e.Id AS EmployeeId, e.FirstName, e.LastName
-                                      FROM Department d LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
+                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, 
+                                        d.[Name], 
+                                        d.Budget, 
+                                        e.Id AS EmployeeId, 
+                                        e.FirstName, 
+                                        e.LastName
+                                      FROM Department d 
+                                      LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     //dictionary lets us add department id to newly created department
@@ -52,7 +58,7 @@ namespace BangazonWorkforce.Controllers
                     {
                         int DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
 
-                        //why does this work?
+                        //why does this work? -> won't each department contain an Id no matter what?
                         if(!departments.ContainsKey(DepartmentId))
                         {
                         Department newDepartment = new Department
@@ -65,13 +71,12 @@ namespace BangazonWorkforce.Controllers
                         departments.Add(DepartmentId, newDepartment);
                         }
 
-
                         //logic for if DB doesn't include any employees; execute logic if DB is not null
                         //add employee to EmployeeIdList within Department class
                         if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
                         {
                             Department currentDepartment = departments[DepartmentId];
-                            currentDepartment.EmployeeIdList.Add(
+                            currentDepartment.EmployeeList.Add(
                                 new Employee
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
@@ -81,114 +86,58 @@ namespace BangazonWorkforce.Controllers
                         }
                     }
 
-
                     reader.Close();
                     //return department dictionary, which holds a list
                     return View(departments.Values.ToList());
                 }
             }
         }
-        //========== END A.C. CODE ==============
         // GET: Departments/Details/5
+        // header: dept name
+        // list of employees
         public ActionResult Details(int id)
         {
-            this._configuration = configuration;
-        }
-
-        public SqlConnection Connection
-        {
-            get
+            using (SqlConnection conn = Connection)
             {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT d.Id AS DepartmentId, 
+                            d.[Name], 
+                            e.Id AS EmployeeId, 
+                            e.FirstName, 
+                            e.LastName
+                        FROM Department d 
+                        LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Department department = null;
+
+                    if (reader.Read())
+                    {
+                        department = new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            EmployeeList = new List<Employee>()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            }
+                        };
+                    }
+
+                    reader.Close();
+                    return View(department);
+                }
             }
         }
-        /*
-                // GET: Instructors
-                public ActionResult Index()
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                       FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id";
-                            SqlDataReader reader = cmd.ExecuteReader();
+        //========== END A.C. CODE ==============
 
-                            List<Instructor> instructors = new List<Instructor>();
-
-                            while (reader.Read())
-                            {
-                                Instructor instructor = new Instructor
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                                    CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                    Cohort = new Cohort
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                        Name = reader.GetString(reader.GetOrdinal("CohortName")),
-                                    }
-                                };
-
-                                instructors.Add(instructor);
-                            }
-
-                            reader.Close();
-                            return View(instructors);
-                        }
-                    }
-                }
-
-                // GET: Instructors/Details/5
-                public ActionResult Details(int id)
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                       FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id
-                                                       Where i.Id = @id";
-                            cmd.Parameters.Add(new SqlParameter("@id", id));
-                            SqlDataReader reader = cmd.ExecuteReader();
-
-                            Instructor instructor = null;
-
-                            if (reader.Read())
-                            {
-                                instructor = new Instructor
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                                    CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                    Cohort = new Cohort
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                        Name = reader.GetString(reader.GetOrdinal("CohortName")),
-                                    }
-                                };
-
-                            }
-
-                            reader.Close();
-                            return View(instructor);
-                        }
-                    }
-                }
-                */
-
+                                     
+                
         // GET: Instructors/Create
         /*
         public ActionResult Create()
