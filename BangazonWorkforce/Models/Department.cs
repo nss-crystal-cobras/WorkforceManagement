@@ -12,6 +12,7 @@ namespace BangazonWorkforce.Models
         public int Id { get; set; }
         [Required]
         [MaxLength(55)]
+        [Display(Name="Department Name")]
         public string Name { get; set; }
         [Required]
         public int Budget { get; set; }
