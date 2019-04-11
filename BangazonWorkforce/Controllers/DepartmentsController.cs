@@ -89,24 +89,7 @@ namespace BangazonWorkforce.Controllers
             }
         }
         //========== END A.C. CODE ==============
-        // GET: Departments/Details/5
-        /*
-                // GET: Instructors
-                public ActionResult Index()
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                       FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id";
-                            SqlDataReader reader = cmd.ExecuteReader();
 
-                            List<Instructor> instructors = new List<Instructor>();
 
 //================================= AUTHOR: DANIEL BREWER ========================================= 
         // GET: Departments/Create
@@ -129,7 +112,7 @@ namespace BangazonWorkforce.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"INSERT INTO Department
-                    ( [Name] )
+                    ([Name])
                     VALUES
                     ( @name)";
                         cmd.Parameters.Add(new SqlParameter("@name", department.Name));
@@ -145,6 +128,6 @@ namespace BangazonWorkforce.Controllers
                 return View(department);
             }
         }
-        //================================================================================================
+        //============================= End of DB Code =======================================
     }
 }
