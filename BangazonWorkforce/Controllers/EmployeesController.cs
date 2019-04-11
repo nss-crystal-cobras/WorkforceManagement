@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforce.Models;
+using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -64,6 +65,52 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
+        //===== AUTHOR: ALLISON COLLINS =========
+        // GET: Employees/Create
+        public ActionResult Create()
+        {
+            EmployeeCreateViewModel viewModel =
+                new EmployeeCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
+        }
+
+        // POST: Employees/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(EmployeeCreateViewModel model)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Employee
+                    ( FirstName, LastName, IsSupervisor, DepartmentId )
+                    VALUES
+                    ( @firstName, @lastName, @isSupervisor, @departmentId )";
+                        cmd.Parameters.Add(new SqlParameter("@firstName", model.Employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@lastName", model.Employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", model.Employee.IsSupervisor));
+                        cmd.Parameters.Add(new SqlParameter("@departmentId", model.Employee.DepartmentId));
+
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            catch
+            {
+                model.Departments = GetAllDepartments();
+                return View(model);
+            }
+        }
+        //========== END A.C. CODE ====================
+
+
+
         //==================================================================================================
         //Hannah
 
@@ -113,6 +160,12 @@ namespace BangazonWorkforce.Controllers
         //            //An employee must have a computer (i.e., computer !== null).
         //            //An employee does not have to be enrolled in a training program but if they are, the training program type needs to show all past and future training programs for the employee.
 
+
+        // GET: Employees/Edit/5
+        //public ActionResult Edit(int id)
+        //{
+        //    return View();
+        //}
         //            while (reader.Read())
         //            {
         //                if (employee == null)
@@ -238,6 +291,34 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, [Name] from Department;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> Departments = new List<Department>();
+
+                    while (reader.Read())
+                    {
+                        Departments.Add(new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        });
+                    }
+                    reader.Close();
+
+                    return Departments;
+                }
+            }
+        }
+
 
         //==================================================================================================
         /*
