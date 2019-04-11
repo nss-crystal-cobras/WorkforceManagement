@@ -37,28 +37,53 @@ namespace BangazonWorkforce.Controllers
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
+                //join tables by department id within employee object to id within department object
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, d.[Name], d.Budget, e.Id
-                                      FROM Department d LEFT JOIN Employee e on e.id = DepartmentId;";
+                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, d.[Name], d.Budget, e.Id AS EmployeeId, e.FirstName, e.LastName
+                                      FROM Department d LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Department> departments = new List<Department>();
+                    //dictionary lets us add department id to newly created department
+                    Dictionary<int, Department> departments = new Dictionary<int, Department>();
 
                     while (reader.Read())
                     {
-                        Department department = new Department
+                        int DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
+
+                        //why does this work?
+                        if(!departments.ContainsKey(DepartmentId))
+                        {
+                        Department newDepartment = new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                         };
 
-                        departments.Add(department);
+                        departments.Add(DepartmentId, newDepartment);
+                        }
+
+
+                        //logic for if DB doesn't include any employees; execute logic if DB is not null
+                        //add employee to EmployeeIdList within Department class
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Department currentDepartment = departments[DepartmentId];
+                            currentDepartment.EmployeeIdList.Add(
+                                new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                });
+                        }
                     }
 
+
                     reader.Close();
-                    return View(departments);
+                    //return department dictionary, which holds a list
+                    return View(departments.Values.ToList());
                 }
             }
         }
