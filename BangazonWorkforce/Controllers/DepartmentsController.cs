@@ -29,8 +29,8 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-
-        // GET: Instructors/Create
+//================================= AUTHOR: DANIEL BREWER ========================================= 
+        // GET: Departments/Create
 
         public ActionResult Create()
         {
@@ -40,7 +40,7 @@ namespace BangazonWorkforce.Controllers
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(model)
+        public ActionResult Create(Department department)
         {
             try
             {
@@ -50,10 +50,10 @@ namespace BangazonWorkforce.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"INSERT INTO Department
-                    ( Name )
+                    ( [Name] )
                     VALUES
                     ( @name)";
-                        cmd.Parameters.Add(new SqlParameter("@name", model.Department.Name));
+                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
                         cmd.ExecuteNonQuery();
 
                         return RedirectToAction(nameof(Index));
@@ -62,9 +62,10 @@ namespace BangazonWorkforce.Controllers
             }
             catch
             {
-                model.Departments = GetAllDepartments();
-                return View(model);
+
+                return View(department);
             }
         }
+        //================================================================================================
     }
 }
