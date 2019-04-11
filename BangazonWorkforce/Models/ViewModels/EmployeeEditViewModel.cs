@@ -13,11 +13,15 @@ namespace BangazonWorkforce.Models.ViewModels
     {
 
         public Employee Employee { get; set; }
+        public int EmployeeId { get; set; }
         public Department Department { get; set; }
         public TrainingProgram TrainingProgram { get; set; }
         public Computer Computer { get; set; }
         public List<TrainingProgram> TrainingPrograms { get; set; }
+        public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
+        public int SelectedTP { get; set; }
+        public int SelectedCE { get; set; }
       
         public List<SelectListItem> DepartmentOptions
         {
@@ -41,16 +45,37 @@ namespace BangazonWorkforce.Models.ViewModels
             get
             {
                 DateTime today = DateTime.Now;
-                if (TrainingPrograms == null && TrainingProgram.StartDate > today)
+                if (TrainingPrograms == null)
+                {
+                    return null;
+                }
+                
+                    return TrainingPrograms.Select(tp => new SelectListItem
+                    {
+                        Value = tp.Id.ToString(),
+                        Text = tp.Name,
+                    }).ToList();
+                
+            }
+        }
+
+        public List<SelectListItem> ComputerOptions
+        {
+
+            get
+            {
+               
+                if (Computers == null)
                 {
                     return null;
                 }
 
-                return TrainingPrograms.Select(tp => new SelectListItem
+                return Computers.Select(c => new SelectListItem
                 {
-                    Value = tp.Id.ToString(),
-                    Text = tp.Name,
+                    Value = c.Id.ToString(),
+                    Text = c.Make,
                 }).ToList();
+
             }
         }
 

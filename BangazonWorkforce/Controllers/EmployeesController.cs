@@ -126,6 +126,7 @@ namespace BangazonWorkforce.Controllers
             {
                 Departments = GetAllDepartments(),
                 TrainingPrograms = GetAllTrainingPrograms(),
+                Computers = GetAllComputers(),
                 Employee = employee
             };
 
@@ -149,15 +150,20 @@ namespace BangazonWorkforce.Controllers
                                                lastname = @lastname,
                                                isSupervisor = @isSupervisor, 
                                                departmentId = @departmentId,
-                                               
-                                         WHERE id = @id;";
+                                             WHERE id = @id;
 
+                                            INSERT INTO employeeTraining
+                                              VALUES(@id, @trainingProgramId);
+
+                                            INSERT INTO computerEmployee
+                                               VALUES ( @id , @computerId);";
+
+                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
+                        cmd.Parameters.Add(new SqlParameter("@trainingProgramId", viewModel.SelectedTP));
                         cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
                         cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
                         cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
-                        //cmd.Parameters.Add(new SqlParameter("@", viewModel.Employee.DepartmentId));
-                        //cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         cmd.ExecuteNonQuery();
@@ -332,7 +338,37 @@ namespace BangazonWorkforce.Controllers
                 }
 
             }
-        
+
+
+        private List<Computer> GetAllComputers()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, make from Computer;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Computer> computers = new List<Computer>();
+
+                    while (reader.Read())
+                    {
+                        computers.Add(new Computer()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("make"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return computers;
+                }
+            }
+
+        }
+
     }
 }
 
