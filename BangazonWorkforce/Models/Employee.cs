@@ -12,9 +12,11 @@ namespace BangazonWorkforce.Models
         public int Id { get; set; }
         [Required]
         [MaxLength(55)]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
         [Required]
         [MaxLength(55)]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
         [Required]
         public bool IsSupervisor { get; set; }
