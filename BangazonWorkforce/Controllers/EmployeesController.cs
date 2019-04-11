@@ -28,6 +28,7 @@ namespace BangazonWorkforce.Controllers
                 return new SqlConnection(connectionString);
             }
         }
+
         // GET: Employees
         public ActionResult Index()
         {
@@ -124,6 +125,7 @@ namespace BangazonWorkforce.Controllers
             EmployeeEditViewModel viewModel = new EmployeeEditViewModel
             {
                 Departments = GetAllDepartments(),
+                TrainingPrograms = GetAllTrainingPrograms(),
                 Employee = employee
             };
 
@@ -142,17 +144,20 @@ namespace BangazonWorkforce.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE employee 
+                        cmd.CommandText = @"UPDATE employee,  
                                            SET firstname = @firstname, 
                                                lastname = @lastname,
                                                isSupervisor = @isSupervisor, 
-                                               departmentId = @departmentId
+                                               departmentId = @departmentId,
+                                               
                                          WHERE id = @id;";
 
                         cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
                         cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
                         cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
+                        //cmd.Parameters.Add(new SqlParameter("@", viewModel.Employee.DepartmentId));
+                        //cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         cmd.ExecuteNonQuery();
@@ -191,7 +196,7 @@ namespace BangazonWorkforce.Controllers
         }
 
 
-        // JD created to grab individual items for editing.
+        // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
         private Employee GetEmployeeById(int id)
         {
             using (SqlConnection conn = Connection)
@@ -203,9 +208,17 @@ namespace BangazonWorkforce.Controllers
                                                e.firstname, 
                                                e.lastname,
                                                e.issupervisor,
-                                               e.departmentid, 
-                                               d.name AS departmentname
+                                               e.departmentid,
+											   c.make,
+											   c.manufacturer,
+                                               tp.[name],
+                                               tp.startDate,
+                                               d.[name] AS departmentname
                                         FROM Employee e INNER JOIN Department d ON e.departmentid = d.id
+                                                        LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+														LEFT JOIN Computer c ON c.Id = ce.ComputerId
+                                                        LEFT JOIN EmployeeTraining et ON e.Id = et.EmployeeId
+                                                        LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
                                          WHERE  e.Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -225,13 +238,25 @@ namespace BangazonWorkforce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
                                 Name = reader.GetString(reader.GetOrdinal("departmentname")),
+                            },
+                            Computer = new Computer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Make = reader.GetString(reader.GetOrdinal("make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
+                            },
+                            TrainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
                             }
                         };
                     }
 
                     reader.Close();
 
-                    return (employee) ;
+                    return (employee);
 
                 }
             }
@@ -264,9 +289,37 @@ namespace BangazonWorkforce.Controllers
                     return departments;
                 }
             }
-
         }
 
+        private List<TrainingProgram> GetAllTrainingPrograms()
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT id, name from TrainingProgram;";
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                        while (reader.Read())
+                        {
+                            trainingPrograms.Add(new TrainingProgram()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("name"))
+                            });
+                        }
+
+                        reader.Close();
+
+                        return trainingPrograms;
+                    }
+                }
+
+            }
+        
     }
 }
 
