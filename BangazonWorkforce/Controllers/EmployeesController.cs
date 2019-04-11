@@ -213,6 +213,8 @@ namespace BangazonWorkforce.Controllers
 											   c.manufacturer,
                                                tp.[name],
                                                tp.startDate,
+                                               c.id AS computerId,
+                                               tp.id AS trainingProgramId,
                                                d.[name] AS departmentname
                                         FROM Employee e INNER JOIN Department d ON e.departmentid = d.id
                                                         LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
@@ -225,7 +227,7 @@ namespace BangazonWorkforce.Controllers
 
                     Employee employee = null;
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
                         employee = new Employee
                         {
@@ -238,20 +240,31 @@ namespace BangazonWorkforce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
                                 Name = reader.GetString(reader.GetOrdinal("departmentname")),
-                            },
-                            Computer = new Computer
+                            }
+                        };
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("computerId")))
+                        {
+                            employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("computerId"));
+                            employee.Computer = new Computer
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
                                 Make = reader.GetString(reader.GetOrdinal("make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
-                            },
-                            TrainingProgram = new TrainingProgram
+                            };
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
+                        {
+                            employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
+                            employee.TrainingProgram = new TrainingProgram
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
                                 Name = reader.GetString(reader.GetOrdinal("name")),
                                 StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
-                            }
-                        };
+                            };
+                        }
+
                     }
 
                     reader.Close();
