@@ -10,39 +10,94 @@
     <h4>Employee</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.Id)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Id)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.FirstName)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.FirstName)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.LastName)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.LastName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsSupervisor)
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Department.Name)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsSupervisor)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Department.Name)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DepartmentId)
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Computer.Id)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DepartmentId)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Computer.Id)
         </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Computer.Make)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Computer.Make)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.Computer.Manufacturer)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Computer.Manufacturer)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.TrainingProgram.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingProgram.Name)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.TrainingProgram.StartDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TrainingProgram.StartDate)
+        </dd>
+                @if (Model.TrainingProgramList.Count > 0)
+                {
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.TrainingProgramList)
+            </dt>
+            <dd class="col-sm-10">
+                <dl>
+                    @foreach (var program in Model.TrainingProgramList)
+                    {
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(prog => program.Name)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(prog => program.Name)
+            </dd>
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(prog => program.StartDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(prog => program.StartDate)
+            </dd>
+            @*<dt class="col-sm-4">
+                @Html.DisplayNameFor(prog => program.EndDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(prog => program.EndDate)
+            </dd>*@
+        }
+                </dl>
+            </dd>
+        }
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.Id */ }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>
