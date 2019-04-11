@@ -153,10 +153,10 @@ namespace BangazonWorkforce.Controllers
                                              WHERE id = @id;
 
                                             INSERT INTO employeeTraining
-                                              VALUES(@id, @trainingProgramId);
+                                              VALUES(@id, @trainingProgramId)
 
                                             INSERT INTO computerEmployee
-                                               VALUES ( @id , @computerId);";
+                                             VALUES ( @id , @computerId);";
 
                         cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
                         cmd.Parameters.Add(new SqlParameter("@trainingProgramId", viewModel.SelectedTP));
