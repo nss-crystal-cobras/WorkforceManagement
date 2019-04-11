@@ -36,9 +36,9 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT e.Id AS EmployeeId,
-                                      e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor
-                                      FROM Employee e LEFT JOIN  Department d on d.id = e.DepartmentId;";
+                    cmd.CommandText = @"   SELECT e.Id, e.departmentId,
+          e.FirstName, e.LastName, d.name AS DepartmentName
+          FROM Employee e LEFT JOIN  Department d on d.Id = e.DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Employee> employees = new List<Employee>();
@@ -47,11 +47,14 @@ namespace BangazonWorkforce.Controllers
                     {
                         Employee employee = new Employee
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")), 
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            Department = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                            }
                         };
 
                         employees.Add(employee);
