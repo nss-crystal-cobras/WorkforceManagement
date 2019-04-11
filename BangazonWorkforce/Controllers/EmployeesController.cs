@@ -72,8 +72,6 @@ namespace BangazonWorkforce.Controllers
 //        3. Currently assigned computer
 //        4. Training programs they have attended, or plan on attending (access the list of training programs associated with the employee)
 
-            //--(Query Training Program and Employee within EmployeeTraining(Query Department within Employee (Query computer within ComputerEmployee) ) )
-
         // GET: Employees/Details/5
         public ActionResult Details(int id)
         {
@@ -82,23 +80,27 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText @"SELECT 
-                    COALESCE(ce.EmployeeId, et.EmployeeId, e.Id) AS 'Employee Id',
-	e.FirstName,
-	e.LastName,
-	d.[Name] AS 'Department Name',
-	ce.AssignDate AS 'Computer Assigned On',
-	ce.ComputerId AS 'Computer Id',
-	--et.Id,
-	et.TrainingProgramId, 
-	tp.[Name] AS 'Training Program', 
-	tp.StartDate AS 'Training Program Start'
-FROM Employee AS e
-FULL OUTER JOIN EmployeeTraining AS et ON e.Id = et.EmployeeId
-INNER JOIN TrainingProgram AS tp ON tp.Id = et.TrainingProgramId
-FULL OUTER JOIN ComputerEmployee AS ce ON e.Id = ce.EmployeeId
-LEFT JOIN Department AS d ON d.Id = e.DepartmentId
-WHERE e.Id = @id";
+                    cmd.CommandText = @"SELECT 
+                COALESCE(ce.EmployeeId, et.EmployeeId, e.Id) AS            'Employee Id',
+	                e.FirstName,
+	                e.LastName,
+	                d.[Name] AS 'Department Name',
+	                ce.AssignDate AS 'Computer Assigned On',
+	                ce.ComputerId AS 'Computer Id',
+	                et.TrainingProgramId, 
+	                tp.[Name] AS 'Training Program', 
+	                tp.StartDate AS 'Training Program Start'
+                FROM Employee AS e
+                FULL OUTER JOIN EmployeeTraining AS et ON e.Id = et.EmployeeId
+                INNER JOIN TrainingProgram AS tp ON tp.Id = et.TrainingProgramId
+                FULL OUTER JOIN ComputerEmployee AS ce ON e.Id = ce.EmployeeId
+                LEFT JOIN Department AS d ON d.Id = e.DepartmentId
+                WHERE e.Id = @id";
+
+                    //NOTE: HMN: This query was tested in SQL and produced, overall, the desired results (based on issue ticket specifications) The List of training programs for employees (past and future) may need to be tweaked to show end date or past date, however.
+
+
+
 
 
 
