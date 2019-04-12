@@ -62,80 +62,48 @@ namespace BangazonWorkforce.Controllers
                         }
                     }
                 }
-/*
-                // GET: TrainingPrograms/Details/5
-                public ActionResult Details(int id)
-        {
-            return View();
-        }
-*/
-        // GET: TrainingPrograms/Create
+
+        //================================= AUTHOR: DANIEL BREWER ========================================= 
+        // GET: Departments/Create
+
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: TrainingPrograms/Create
+        // POST: TrainingProgram/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(TrainingProgram trainingProgram)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees)
+                                          VALUES (@name, @startdate, @enddate, @maxattendees)";
 
-                return RedirectToAction(nameof(Index));
+                        cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name));
+                        cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate));
+                        cmd.Parameters.Add(new SqlParameter("@enddate", trainingProgram.EndDate));
+                        cmd.Parameters.Add(new SqlParameter("@maxattendees", trainingProgram.MaxAttendees));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
-                return View();
+
+                return View(trainingProgram);
             }
         }
+        //============================= End of DB Code =======================================
 
-        // GET: TrainingPrograms/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
 
-        // POST: TrainingPrograms/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: TrainingPrograms/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: TrainingPrograms/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
