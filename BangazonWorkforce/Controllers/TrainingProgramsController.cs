@@ -43,19 +43,26 @@ namespace BangazonWorkforce.Controllers
                             SqlDataReader reader = cmd.ExecuteReader();
 
                             List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+                    
+                           /* set variable to timestamp here */
+                           DateTime CurrentDate = DateTime.Now;
 
-                            while (reader.Read())
-                            {
-                                TrainingProgram trainingProgram = new TrainingProgram
-                                {
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
-                                    StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                                    EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                                    MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
-                                };
+                    while (reader.Read())
+                    {
+                        TrainingProgram trainingProgram = new TrainingProgram
+                        {
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
+                        };
 
-                                trainingPrograms.Add(trainingProgram);
-                            }
+                        /* add if statement to check for enddate */
+                        if (CurrentDate < trainingProgram.EndDate)
+                        {
+                            trainingPrograms.Add(trainingProgram);
+                        }
+                    }
 
                             reader.Close();
                             return View(trainingPrograms);
