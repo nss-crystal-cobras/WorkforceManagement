@@ -70,6 +70,79 @@ namespace BangazonWorkforce.Controllers
         // GET: Computers/Details/5
         public ActionResult Details(int id)
         {
+
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELCET c.id, c.make, 
+                                               c.manufacturer, c.purchaseDate,
+                                               e.fullName
+                                          from computer c 
+                                               left join employee e on c.id = s.cohortid
+                                               left join Instructor i on c.id = i.CohortId
+                                         where c.id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Cohort cohort = null;
+                    while (reader.Read())
+                    {
+                        if (cohort == null)
+                        {
+                            cohort = new Cohort
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("name"))
+                            };
+                        }
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("StudentId")))
+                        {
+                            int studentId = reader.GetInt32(reader.GetOrdinal("StudentId"));
+                            if (!cohort.Students.Any(s => s.Id == studentId))
+                            {
+                                Student student = new Student
+                                {
+                                    Id = studentId,
+                                    FirstName = reader.GetString(reader.GetOrdinal("StudentFirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("StudentLastName")),
+                                    SlackHandle = reader.GetString(reader.GetOrdinal("StudentSlackHandle")),
+                                    CohortId = cohort.Id
+                                };
+                                cohort.Students.Add(student);
+                            }
+                        }
+
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("InstructorId")))
+                        {
+                            int instructorId = reader.GetInt32(reader.GetOrdinal("InstructorId"));
+                            if (!cohort.Instructors.Any(i => i.Id == instructorId))
+                            {
+                                Instructor instructor = new Instructor
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("InstructorFirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("InstructorLastName")),
+                                    SlackHandle = reader.GetString(reader.GetOrdinal("InstructorSlackHandle")),
+                                    CohortId = cohort.Id
+                                };
+
+                                cohort.Instructors.Add(instructor);
+                            }
+                        }
+                    }
+
+
+                    reader.Close();
+                    return View(cohort);
+                }
+            }
+
+
+
             return View();
         }
 
