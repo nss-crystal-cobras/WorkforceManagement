@@ -221,10 +221,10 @@ namespace BangazonWorkforce.Controllers
                                                  tp.StartDate AS 'Training Program Start'
                                             FROM Employee AS e 
                                             LEFT JOIN Department d ON d.Id = e.DepartmentId
-                                            RIGHT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id 
-                                            INNER JOIN Computer c ON c.Id = ce.ComputerId
-                                            RIGHT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
-                                            INNER JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
+                                            LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id 
+                                            LEFT JOIN Computer c ON c.Id = ce.ComputerId
+                                            LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
+                                            LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
                                             WHERE e.Id = @id AND ce.UnassignDate IS NULL";
 
                     //NOTE: HMN: This query was tested in SQL and produced, overall, the desired results (based on issue ticket specifications) The List of training programs for employees (past and future) may need to be tweaked to show end date or past date, however.
@@ -249,15 +249,23 @@ namespace BangazonWorkforce.Controllers
                                     Id = reader.GetInt32(reader.GetOrdinal("Department Id")),
                                     Name = reader.GetString(reader.GetOrdinal("Department Name")),
                                 },
-                                Computer = new Computer
-                                {
-
-                                    Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
-                                    Make = reader.GetString(reader.GetOrdinal("Computer Make")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer")),
-                                }
+                                Computer = new Computer(),
+                                TrainingProgramList = new List<TrainingProgram>()
                             };
                         }
+
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("Computer Id")))
+                        {
+                            employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("Computer Id"));
+                            employee.Computer = new Computer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
+                                Make = reader.GetString(reader.GetOrdinal("Computer Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer"))
+                            };
+                        }
+
                         if (!reader.IsDBNull(reader.GetOrdinal("Employee Id")))
                         {
 
@@ -277,10 +285,11 @@ namespace BangazonWorkforce.Controllers
                         }
                         //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
                         //DecommissionDate
-
                     }
-                        reader.Close();
-                        return View(employee);
+
+                    reader.Close();
+                    return View(employee);
+
                 }
             }
         }
@@ -457,6 +466,7 @@ namespace BangazonWorkforce.Controllers
                 }
 
             }
+        }
     }
-}
+
 
