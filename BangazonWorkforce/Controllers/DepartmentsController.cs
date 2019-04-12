@@ -346,5 +346,47 @@ namespace BangazonWorkforce.Controllers
                 }
                */
         }
+        //========== END A.C. CODE ==============
+
+
+//================================= AUTHOR: DANIEL BREWER ========================================= 
+        // GET: Departments/Create
+
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Department/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(Department department)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO Department
+                    ([Name], Budget)
+                    VALUES
+                    (@name, @budget)";
+                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
+                        cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            catch
+            {
+
+                return View(department);
+            }
+        }
+        //============================= End of DB Code =======================================
     }
 }
