@@ -142,6 +142,7 @@ namespace BangazonWorkforce.Controllers
                                                     d.Id AS 'Department Id',
                                                  d.[Name] AS 'Department Name',
                                                  ce.AssignDate AS 'Computer Assigned On',
+                                                 ce.UnassignDate AS 'Computer Retired On',
                                                  c.Id AS 'Computer Id',
                                                  c.Make AS 'Computer Make',
                                                  c.Manufacturer AS 'Computer Manufacturer',
@@ -155,7 +156,7 @@ namespace BangazonWorkforce.Controllers
                                             INNER JOIN Computer c ON c.Id = ce.ComputerId
                                             RIGHT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
                                             INNER JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
-                                            WHERE e.Id = @id AND ce.UnAssignDate IS NULL";
+                                            WHERE e.Id = @id AND ce.UnassignDate IS NULL";
 
                     //NOTE: HMN: This query was tested in SQL and produced, overall, the desired results (based on issue ticket specifications) The List of training programs for employees (past and future) may need to be tweaked to show end date or past date, however.
 
@@ -180,12 +181,19 @@ namespace BangazonWorkforce.Controllers
                                     Name = reader.GetString(reader.GetOrdinal("Department Name")),
                                 },
                                 Computer = new Computer
+
+                                if (!reader.IsDBNull(reader.GetOrdinal("Computer Id")))
+                            {
+                                if (!employee.TrainingProgramList.Exists(tp => tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
-                                    Make = reader.GetString(reader.GetOrdinal("Computer Make")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer"))
-                                },
-                                TrainingProgramList = new List<TrainingProgram>()
+                                        Make = reader.GetString(reader.GetOrdinal("Computer Make")),
+                                        Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer")),
+                                    //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
+                                    //DecommissionDate
+                                    },
+                                    TrainingProgramList = new List<TrainingProgram>()
+                                    }
                             };
                         }
 
