@@ -7,17 +7,19 @@
 
 <h1>@Html.DisplayFor(model => model.Name)</h1>
 
+<hr />
 <div>
-    <hr />
+    <h4>@Html.DisplayNameFor(model => model.EmployeeList):</h4>
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EmployeeList)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EmployeeCount)
-        </dd>
+        @foreach (Employee item in Model.EmployeeList)
+        {
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => item.FullName)
+            </dd>
+        }
     </dl>
 </div>
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
