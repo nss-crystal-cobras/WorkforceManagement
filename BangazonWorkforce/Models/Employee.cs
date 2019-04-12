@@ -19,5 +19,6 @@ namespace BangazonWorkforce.Models
         public TrainingProgram TrainingProgram { get; set; }
 
         public List<TrainingProgram> EmployeeTraining { get; set; }
+        public TrainingProgram TrainingProgram { get; set; } = new TrainingProgram();
     }
 }
