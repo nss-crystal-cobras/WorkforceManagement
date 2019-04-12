@@ -10,17 +10,17 @@ namespace BangazonWorkforce.Models
     {
         [Required]
         public int Id { get; set; }
+
         [Required]
         [MaxLength(55)]
         [Display(Name = "Department Name")]
         public string Name { get; set; }
+
         [Required]
         public int Budget { get; set; }
 
         [Display(Name="Employees")]
         public List<Employee> EmployeeList { get; set; } = new List<Employee>();
-
-        public Employee Employee { get; set; } = new Employee();
 
         [Display(Name="Department Size")]
         public int EmployeeCount
