@@ -111,17 +111,8 @@ namespace BangazonWorkforce.Controllers
         }
         //========== END A.C. CODE ====================
 
-        //=======================================================================================
-        //Begin HANNAH Get Details
-        //=======================================================================================
-        // GET: Employees/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-        //=======================================================================================
 
-       
+
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
@@ -187,6 +178,10 @@ namespace BangazonWorkforce.Controllers
                 return View(viewModel);
             }
         }
+        //=======================================================================================
+        //Begin HANNAH Get Details
+        //=======================================================================================
+
 
         // Ticket Instructions:
         //         1. First name and last name (of Employee)
@@ -255,22 +250,14 @@ namespace BangazonWorkforce.Controllers
                                     Name = reader.GetString(reader.GetOrdinal("Department Name")),
                                 },
                                 Computer = new Computer
-
-                                if (!reader.IsDBNull(reader.GetOrdinal("Computer Id")))
-                            {
-                                if (!employee.TrainingProgramList.Exists(tp => tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
                                 {
+
                                     Id = reader.GetInt32(reader.GetOrdinal("Computer Id")),
-                                        Make = reader.GetString(reader.GetOrdinal("Computer Make")),
-                                        Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer")),
-                                    //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
-                                    //DecommissionDate
-                                    },
-                                    TrainingProgramList = new List<TrainingProgram>()
-                                    }
+                                    Make = reader.GetString(reader.GetOrdinal("Computer Make")),
+                                    Manufacturer = reader.GetString(reader.GetOrdinal("Computer Manufacturer")),
+                                }
                             };
                         }
-
                         if (!reader.IsDBNull(reader.GetOrdinal("Employee Id")))
                         {
 
@@ -278,7 +265,7 @@ namespace BangazonWorkforce.Controllers
                             {
                                 if (!employee.TrainingProgramList.Exists(tp => tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
                                 {
-                                        TrainingProgram trainingProgram = new TrainingProgram
+                                    TrainingProgram trainingProgram = new TrainingProgram
                                     {
                                         Id = reader.GetInt32(reader.GetOrdinal("Training Program Id")),
                                         Name = reader.GetString(reader.GetOrdinal("Training Program")),
@@ -288,30 +275,31 @@ namespace BangazonWorkforce.Controllers
                                 }
                             }
                         }
+                        //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
+                        //DecommissionDate
 
-                    };
-
-                    reader.Close();
-                    return View(employee);
+                    }
+                        reader.Close();
+                        return View(employee);
                 }
             }
         }
 
-        //=======================================================================================
-                                //End HANNAH Get Details
-        //=======================================================================================
+            //=======================================================================================
+            //End HANNAH Get Details
+            //=======================================================================================
 
 
 
-        // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
-        private Employee GetEmployeeById(int id)
-        {
-            using (SqlConnection conn = Connection)
+            // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
+            private Employee GetEmployeeById(int id)
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @"SELECT e.id, 
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT e.id, 
                                                e.firstname, 
                                                e.lastname,
                                                e.issupervisor,
@@ -329,89 +317,89 @@ namespace BangazonWorkforce.Controllers
                                                         LEFT JOIN EmployeeTraining et ON e.Id = et.EmployeeId
                                                         LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
                                          WHERE  e.Id = @id;";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = cmd.ExecuteReader();
 
-                    Employee employee = null;
+                        Employee employee = null;
 
-                    while (reader.Read())
-                    {
-                        employee = new Employee
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            Department = new Department
+                            employee = new Employee
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
-                                Name = reader.GetString(reader.GetOrdinal("departmentname")),
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Department = new Department
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
+                                    Name = reader.GetString(reader.GetOrdinal("departmentname")),
+                                }
+                            };
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("computerId")))
+                            {
+                                employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("computerId"));
+                                employee.Computer = new Computer
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Make = reader.GetString(reader.GetOrdinal("make")),
+                                    Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
+                                };
                             }
-                        };
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("computerId")))
-                        {
-                            employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("computerId"));
-                            employee.Computer = new Computer
+                            if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Make = reader.GetString(reader.GetOrdinal("make")),
-                                Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
-                            };
+                                employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
+                                employee.TrainingProgram = new TrainingProgram
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                    Name = reader.GetString(reader.GetOrdinal("name")),
+                                    StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
+                                };
+                            }
+
                         }
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
-                        {
-                            employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
-                            employee.TrainingProgram = new TrainingProgram
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
-                            };
-                        }
+                        reader.Close();
+
+                        return (employee);
 
                     }
-
-                    reader.Close();
-
-                    return (employee);
-
                 }
             }
-        }
 
-        // JD - Wrote this for grabbing all instances of departments for employee views.
-        private List<Department> GetAllDepartments()
-        {
-            using (SqlConnection conn = Connection)
+            // JD - Wrote this for grabbing all instances of departments for employee views.
+            private List<Department> GetAllDepartments()
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @"SELECT id, name from Department;";
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    List<Department> departments = new List<Department>();
-
-                    while (reader.Read())
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        departments.Add(new Department
+                        cmd.CommandText = @"SELECT id, name from Department;";
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        List<Department> departments = new List<Department>();
+
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("name"))
-                        });
+                            departments.Add(new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("name"))
+                            });
+                        }
+
+                        reader.Close();
+
+                        return departments;
                     }
-
-                    reader.Close();
-
-                    return departments;
                 }
             }
-        }
 
-        private List<TrainingProgram> GetAllTrainingPrograms()
+            private List<TrainingProgram> GetAllTrainingPrograms()
             {
                 using (SqlConnection conn = Connection)
                 {
@@ -441,35 +429,34 @@ namespace BangazonWorkforce.Controllers
             }
 
 
-        private List<Computer> GetAllComputers()
-        {
-            using (SqlConnection conn = Connection)
+            private List<Computer> GetAllComputers()
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @"SELECT id, make from Computer;";
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    List<Computer> computers = new List<Computer>();
-
-                    while (reader.Read())
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        computers.Add(new Computer()
+                        cmd.CommandText = @"SELECT id, make from Computer;";
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        List<Computer> computers = new List<Computer>();
+
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Make = reader.GetString(reader.GetOrdinal("make"))
-                        });
+                            computers.Add(new Computer()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Make = reader.GetString(reader.GetOrdinal("make"))
+                            });
+                        }
+
+                        reader.Close();
+
+                        return computers;
                     }
-
-                    reader.Close();
-
-                    return computers;
                 }
+
             }
-
-        }
-
     }
 }
 
