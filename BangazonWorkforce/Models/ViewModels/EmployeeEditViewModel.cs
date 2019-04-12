@@ -20,8 +20,10 @@ namespace BangazonWorkforce.Models.ViewModels
         public List<TrainingProgram> TrainingPrograms { get; set; }
         public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
-        public int SelectedTP { get; set; }
+        public List<int> SelectedTPs { get; set; }
+        public List<TrainingProgram> CurrentEmpTP { get; set; }
         public int SelectedCE { get; set; }
+
       
         public List<SelectListItem> DepartmentOptions
         {

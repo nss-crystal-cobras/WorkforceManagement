@@ -8,6 +8,7 @@ using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Remotion.Linq.Clauses;
 
 namespace BangazonWorkforce.Controllers
 {
@@ -128,11 +129,16 @@ namespace BangazonWorkforce.Controllers
                 return NotFound();
             }
 
+
+            var tempTP = GetEmpTPbyId(id);
+
             //This piece of code keeps the type correct to pass into the edit
             EmployeeEditViewModel viewModel = new EmployeeEditViewModel
             {
                 Departments = GetAllDepartments(),
                 TrainingPrograms = GetAllTrainingPrograms(),
+                CurrentEmpTP = GetEmpTPbyId(id),
+                SelectedTPs = tempTP.Select(tp => tp.Id).ToList(),
                 Computers = GetAllComputers(),
                 Employee = employee
             };
@@ -145,43 +151,54 @@ namespace BangazonWorkforce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EmployeeEditViewModel viewModel)
         {
-            try
+
+
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                    cmd.CommandText = @"UPDATE employee 
+                                            SET    firstname = @firstname, 
+                                                   lastname = @lastname,
+                                                   isSupervisor = @isSupervisor, 
+                                                   departmentId = @departmentId
+                                            WHERE  id = @id;
+
+                                            UPDATE computerEmployee
+                                            SET    computerId = @computerId
+                                            WHERE  employeeId = @id;
+
+                                            DELETE FROM EmployeeTraining
+                                            WHERE employeeId = @id;";
+
+
+                    cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
+                    cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
+                    cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    cmd.ExecuteNonQuery();
+
+
+                    cmd.CommandText = @"INSERT INTO employeeTraining (employeeId, trainingProgramId)
+                                            VALUES ( @id, @trainingId );";
+
+                    foreach (var tpID in viewModel.SelectedTPs)
                     {
-                        cmd.CommandText = @"UPDATE employee,  
-                                           SET firstname = @firstname, 
-                                               lastname = @lastname,
-                                               isSupervisor = @isSupervisor, 
-                                               departmentId = @departmentId,
-                                             WHERE id = @id;
-
-                                            INSERT INTO employeeTraining
-                                              VALUES(@id, @trainingProgramId)
-
-                                            INSERT INTO computerEmployee
-                                             VALUES ( @id , @computerId);";
-
-                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
-                        cmd.Parameters.Add(new SqlParameter("@trainingProgramId", viewModel.SelectedTP));
-                        cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
-                        cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
-                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
-                        cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add(new SqlParameter("@trainingId", tpID));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         cmd.ExecuteNonQuery();
 
-                        return RedirectToAction(nameof(Index));
                     }
+
+
+                    return RedirectToAction(nameof(Index));
                 }
-            }
-            catch
-            {
-                return View(viewModel);
             }
         }
 
@@ -210,6 +227,49 @@ namespace BangazonWorkforce.Controllers
 
 
         // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
+        private List<TrainingProgram> GetEmpTPbyId(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT tp.id,
+                                               tp.[name],
+                                               tp.startDate    
+
+                                               FROM trainingProgram tp 
+                                               LEFT JOIN employeeTraining et ON tp.id = et.id
+                                               LEFT JOIN employee e ON et.id = e.id 
+                                               
+                                               WHERE  e.Id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> CurrentEmpTP = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        CurrentEmpTP.Add (new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("id")),
+                            Name = reader.GetString(reader.GetOrdinal("name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+                         
+                        });
+
+
+                    }
+
+                    reader.Close();
+
+                    return (CurrentEmpTP);
+
+                }
+            }
+        }
+
+
         private Employee GetEmployeeById(int id)
         {
             using (SqlConnection conn = Connection)

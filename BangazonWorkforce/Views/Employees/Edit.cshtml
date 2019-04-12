@@ -48,16 +48,11 @@
                 <select asp-for="Employee.DepartmentId" asp-items="@Model.DepartmentOptions"></select>
                 <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
             </div>
+         
             <div class="form-group">
-                <label asp-for="Employee.TrainingProgram.Name" class="control-label"></label>
-                <input asp-for="Employee.TrainingProgram.Name" class="form-control" />
-                <span asp-validation-for="Employee.TrainingProgram.Name" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="SelectedTP" class="control-label"></label>
-                <select asp-for="SelectedTP" asp-items="@Model.TrainingProgramOptions"></select>
-                <span asp-validation-for="SelectedTP" class="text-danger"></span>
+                <label asp-for="SelectedTPs" class="control-label"></label>
+                <select multiple asp-for="SelectedTPs" asp-items="@Model.TrainingProgramOptions"></select>
+                <span asp-validation-for="SelectedTPs" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
