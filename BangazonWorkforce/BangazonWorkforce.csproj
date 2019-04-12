@@ -17,7 +17,6 @@
 
     <Folder Include="Models\ViewModels\" />
     <Folder Include="Views\Departments\" />
-    <Folder Include="Views\Computers\" />
   </ItemGroup>
 
 </Project>
