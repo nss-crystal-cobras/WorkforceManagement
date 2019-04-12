@@ -68,7 +68,14 @@ namespace BangazonWorkforce.Controllers
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
 
-                            newDepartment.EmployeeList = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
+                            List<Employee> employees = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
+
+                            if(employees.Count() > 0)
+                            {
+                                newDepartment.EmployeeList = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
+                            }
+
+                            
 
                             departments.Add(DepartmentId, newDepartment);
                         }
@@ -137,6 +144,7 @@ namespace BangazonWorkforce.Controllers
                             int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
                             //Any() method determines if a matching element exists in a collection
                             //EmployeeList defined in Department.cs
+                            //looking for existing employee in list; if no instance of current employee is in list, create it here
                             if (!department.EmployeeList.Any(e => e.Id == employeeId))
                             {
                                 Employee employee = new Employee
@@ -146,7 +154,10 @@ namespace BangazonWorkforce.Controllers
                                     LastName = reader.GetString(reader.GetOrdinal("LastName"))
                                 };
                                 department.EmployeeList.Add(employee);
-                            }
+                            } 
+                        } else
+                        {
+                            return NotFound();
                         }
                     }
                     reader.Close();
