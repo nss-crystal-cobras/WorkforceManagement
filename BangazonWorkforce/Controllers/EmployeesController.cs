@@ -30,6 +30,9 @@ namespace BangazonWorkforce.Controllers
         }
 
         // GET: Employees
+        //================= AUTHOR: DANIEL BREWER ======================
+        // First Name, Last Name, Department Name
+
         public ActionResult Index()
         {
             using (SqlConnection conn = Connection)

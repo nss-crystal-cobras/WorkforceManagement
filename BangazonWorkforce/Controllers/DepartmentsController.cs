@@ -89,107 +89,20 @@ namespace BangazonWorkforce.Controllers
             }
         }
         //========== END A.C. CODE ==============
-        // GET: Departments/Details/5
-        /*
-                // GET: Instructors
-                public ActionResult Index()
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                       FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id";
-                            SqlDataReader reader = cmd.ExecuteReader();
 
-                            List<Instructor> instructors = new List<Instructor>();
 
-                            while (reader.Read())
-                            {
-                                Instructor instructor = new Instructor
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                                    CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                    Cohort = new Cohort
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                        Name = reader.GetString(reader.GetOrdinal("CohortName")),
-                                    }
-                                };
+//================================= AUTHOR: DANIEL BREWER ========================================= 
+        // GET: Departments/Create
 
-                                instructors.Add(instructor);
-                            }
-
-                            reader.Close();
-                            return View(instructors);
-                        }
-                    }
-                }
-
-                // GET: Instructors/Details/5
-                public ActionResult Details(int id)
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                       FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id
-                                                       Where i.Id = @id";
-                            cmd.Parameters.Add(new SqlParameter("@id", id));
-                            SqlDataReader reader = cmd.ExecuteReader();
-
-                            Instructor instructor = null;
-
-                            if (reader.Read())
-                            {
-                                instructor = new Instructor
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                                    CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                    Cohort = new Cohort
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                        Name = reader.GetString(reader.GetOrdinal("CohortName")),
-                                    }
-                                };
-
-                            }
-
-                            reader.Close();
-                            return View(instructor);
-                        }
-                    }
-                }
-                */
-
-        // GET: Instructors/Create
-        /*
         public ActionResult Create()
         {
-            DepartmentCreateViewModel viewModel =
-        new DepartmentCreateViewModel(_configuration.GetConnectionString("DefaultConnection"));
-            return View(viewModel);
+            return View();
         }
 
-        // POST: Instructors/Create
+        // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(DepartmentCreateViewModel viewModel)
+        public ActionResult Create(Department department)
         {
             try
             {
@@ -198,11 +111,12 @@ namespace BangazonWorkforce.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"INSERT INTO instructor (firstname, lastname, slackhandle, cohortid)
-                                             VALUES (@firstname, @lastname, @slackhandle, @cohortid)";
-                        cmd.Parameters.Add(new SqlParameter("@name", viewModel.Department.Name));
-                        cmd.Parameters.Add(new SqlParameter("@budget", viewModel.Department.Budget));
-
+                        cmd.CommandText = @"INSERT INTO Department
+                    ([Name], Budget)
+                    VALUES
+                    (@name, @budget)";
+                        cmd.Parameters.Add(new SqlParameter("@name", department.Name));
+                        cmd.Parameters.Add(new SqlParameter("@budget", department.Budget));
                         cmd.ExecuteNonQuery();
 
                         return RedirectToAction(nameof(Index));
@@ -211,161 +125,10 @@ namespace BangazonWorkforce.Controllers
             }
             catch
             {
-                return View(viewModel);
+
+                return View(department);
             }
         }
-        /*
-                // GET: Instructors/Edit/5
-                public ActionResult Edit(int id)
-                {
-
-                    Instructor instructor = GetInstructorById(id);
-                    if (instructor == null)
-                    {
-                        return NotFound();
-                    }
-
-                    InstructorEditViewModel viewModel = new InstructorEditViewModel
-                    {
-                        Cohorts = GetAllCohorts(),
-                        Instructor = instructor
-                    };
-
-                    return View(viewModel);
-                }
-
-                // POST: Instructors/Edit/5
-                [HttpPost]
-                [ValidateAntiForgeryToken]
-                public ActionResult Edit(int id, InstructorEditViewModel viewModel)
-                {
-                    try
-                    {
-                        using (SqlConnection conn = Connection)
-                        {
-                            conn.Open();
-                            using (SqlCommand cmd = conn.CreateCommand())
-                            {
-                                cmd.CommandText = @"UPDATE instructor 
-                                                   SET firstname = @firstname, 
-                                                       lastname = @lastname,
-                                                       slackhandle = @slackhandle, 
-                                                       cohortid = @cohortid
-                                                       WHERE id = @id;";
-                                cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Instructor.FirstName));
-                                cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Instructor.LastName));
-                                cmd.Parameters.Add(new SqlParameter("@slackhandle", viewModel.Instructor.SlackHandle));
-                                cmd.Parameters.Add(new SqlParameter("@cohortid", viewModel.Instructor.CohortId));
-                                cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                                cmd.ExecuteNonQuery();
-
-                                return RedirectToAction(nameof(Index));
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        viewModel.Cohorts = GetAllCohorts();
-                        return View(viewModel);
-                    }
-                }
-
-                // GET: Instructors/Delete/5
-                public ActionResult Delete(int id)
-                {
-                    return View();
-                }
-
-                // POST: Instructors/Delete/5
-                [HttpPost]
-                [ValidateAntiForgeryToken]
-                public ActionResult Delete(int id, IFormCollection collection)
-                {
-                    try
-                    {
-                        // TODO: Add delete logic here
-
-                        return RedirectToAction(nameof(Index));
-                    }
-                    catch
-                    {
-                        return View();
-                    }
-                }
-
-                private Instructor GetInstructorById(int id)
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT i.Id AS InstructorId,
-                                                       i.FirstName, i.LastName, 
-                                                       i.SlackHandle, i.CohortId,
-                                                       c.Name AS CohortName
-                                                  FROM Instructor i LEFT JOIN Cohort c on i.cohortid = c.id
-                                                 WHERE  i.Id = @id";
-                            cmd.Parameters.Add(new SqlParameter("@id", id));
-                            SqlDataReader reader = cmd.ExecuteReader();
-
-                            Instructor instructor = null;
-
-                            if (reader.Read())
-                            {
-                                instructor = new Instructor
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("InstructorId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                    SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                                    CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                    Cohort = new Cohort
-                                    {
-                                        Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                        Name = reader.GetString(reader.GetOrdinal("CohortName")),
-                                    }
-                                };
-                            }
-
-                            reader.Close();
-
-                            return instructor;
-                        }
-                    }
-
-                }
-
-                private List<Cohort> GetAllCohorts()
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT id, name from Cohort;";
-                            SqlDataReader reader = cmd.ExecuteReader();
-
-                            List<Cohort> cohorts = new List<Cohort>();
-
-                            while (reader.Read())
-                            {
-                                cohorts.Add(new Cohort
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name"))
-                                });
-                            }
-                            reader.Close();
-
-                            return cohorts;
-                        }
-                    }
-
-                }
-
-            }
-           */
+        //============================= End of DB Code =======================================
     }
 }
