@@ -29,8 +29,8 @@ namespace BangazonWorkforce.Controllers
                 return new SqlConnection(connectionString);
             }
         }
-        // GET: Departments
         //================= AUTHOR: ALLISON COLLINS ======================
+        // GET: Departments
         // dept name, dept budget, size of dept (number of employees assigned)
         public ActionResult Index()
         {
@@ -118,19 +118,37 @@ namespace BangazonWorkforce.Controllers
 
                     while (reader.Read())
                     {
-                        department = new Department
+                        if (department == null)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                           
-                        };
-                    }
+                            department = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                            };
+                        }
 
-                    reader.Close();
-                    return View(department);
+                        //if DB is not null, fetch employee info
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
+                            //Any() method determines if a matching element exists in a collection
+                            if (!department.EmployeeList.Any(e => e.Id == employeeId))
+                            {
+                                Employee employee = new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };
+                                department.EmployeeList.Add(employee);
+                            }
+                        }
+
+                        reader.Close();
+                        return View(department);
+                    }
                 }
             }
-        }
         //========== END A.C. CODE ==============
 
                                      
