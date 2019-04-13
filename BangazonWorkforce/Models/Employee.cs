@@ -18,7 +18,7 @@ namespace BangazonWorkforce.Models
         [MaxLength(55)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
-        [Display(Name = "Instructor Name")]
+        [Display(Name = "Employee's Name")]
         public string FullName
         {
             get

@@ -119,7 +119,9 @@ namespace BangazonWorkforce.Controllers
                 return View(model);
             }
         }
-       
+
+      
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
@@ -132,7 +134,7 @@ namespace BangazonWorkforce.Controllers
 
             var tempTP = GetEmpTPbyId(id);
 
-            //This piece of code keeps the type correct to pass into the edit
+            //This piece of code will set the values needed for edit. It calls on the methods written at the bottom of this controller.
             EmployeeEditViewModel viewModel = new EmployeeEditViewModel
             {
                 Departments = GetAllDepartments(),
@@ -145,7 +147,9 @@ namespace BangazonWorkforce.Controllers
 
             return View(viewModel);
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -201,6 +205,7 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
         // GET: Employees/Delete/5
         public ActionResult Delete(int id)
@@ -224,8 +229,9 @@ namespace BangazonWorkforce.Controllers
                 return View();
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
-
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
         private List<TrainingProgram> GetEmpTPbyId(int id)
         {
@@ -268,8 +274,9 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
-
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         private Employee GetEmployeeById(int id)
         {
             using (SqlConnection conn = Connection)
@@ -347,7 +354,9 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // JD - Wrote this for grabbing all instances of departments for employee views.
         private List<Department> GetAllDepartments()
         {
@@ -376,7 +385,9 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         private List<TrainingProgram> GetAllTrainingPrograms()
             {
                 using (SqlConnection conn = Connection)
@@ -405,8 +416,11 @@ namespace BangazonWorkforce.Controllers
                 }
 
             }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
 
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         private List<Computer> GetAllComputers()
         {
             using (SqlConnection conn = Connection)
@@ -435,7 +449,7 @@ namespace BangazonWorkforce.Controllers
             }
 
         }
-
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
     }
 }
 

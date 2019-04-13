@@ -11,8 +11,13 @@ namespace BangazonWorkforce.Models
         public int Id { get; set; }
 
         [Required]
+        [Display(Name = "Payment Name")]
         public string Name { get; set; }
+        [Required]
+        [Display(Name = "Account Number")]
         public int AcctNumber { get; set; }
+        [Required]
+        [Display(Name = "Customer ID")]
         public int CustomerId { get; set; }
     }
 }
