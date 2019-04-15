@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+
 
 namespace BangazonWorkforce.Models
 {
@@ -9,7 +11,9 @@ namespace BangazonWorkforce.Models
     public class TrainingProgram
     {
         public int Id { get; set; }
+        [Display (Name = "Training Program")]
         public string Name { get; set; }
+        [Display (Name = "Training Program Start Date")]
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int MaxAttendees { get; set; }
