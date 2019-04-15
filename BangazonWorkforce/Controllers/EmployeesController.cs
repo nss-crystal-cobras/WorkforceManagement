@@ -70,8 +70,6 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-
-
         //================= AUTHOR: ALLISON COLLINS ======================
 
         // GET: Employees/Create
