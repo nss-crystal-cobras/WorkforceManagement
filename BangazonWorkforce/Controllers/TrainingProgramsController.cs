@@ -118,7 +118,7 @@ namespace BangazonWorkforce.Controllers
                  Given user is viewing the list of training programs
                 When the user clicks on a training program
                 Then the user should see all details of that training program
-                And any employees that are currently attending the program
+                And any employees that are currently attending the program ---> For this, you will need to access TrainingPrograms via EmployeeTraining
 
                 Given user is viewing the details of a training program
                 When the user clicks on the edit link
@@ -133,9 +133,9 @@ namespace BangazonWorkforce.Controllers
         //=============================== Helper Functions =======================================
 
 
-        // This grabs ALL the Training Programs with ALL OF their respective data from the database:
+        // NOTE: This grabs ALL the Training Programs with ALL OF their respective data from the database:
         //private List<TrainingProgram> GetAllTrainingProgramsById(int id)
-        private TrainingProgram GetAllTrainingProgramsById(int id)
+        private TrainingProgram GetAllTrainingProgramsByIdToEdit(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -172,6 +172,41 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-        //====================================== End Helper Functions ======================================
-    }
+        //----------------------------------------------------------------------------------------------------------------------------------------
+        // NOTE: Get Individual Employees' Training Programs (via EmployeeTraining join table)
+
+        // Get EmployeeTraining + TrainingProgram + Employee
+        // Join Employee to TrainingProgram on  EmployeeTraining
+
+        public ActionResult GetTrainingProgramDetails(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT
+                                            e.Id AS 'Employee Id', 
+                                            e.FirstName AS 'Employee First Name',
+                                            e.LastName AS 'Employee Last Name',
+                                            tp.Id AS 'Training Program Id',
+                                            tp.[Name] AS 'Training Program Name',                                  tp.StartDate AS 'Training Program Start',
+                                            tp.EndDate AS 'Training Program End',                                  tp.MaxAttendees AS 'Max Attendees',
+                                            et.EmployeeId AS 'Employee-Training-Id',
+                                            et.TrainingProgramId AS 'Employee-Training-Program-Id'
+                                        FROM TrainingProgram AS tp
+                                        LEFT JOIN Employee e ON e.Id = et.EmployeeId
+                                        LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId";
+
+                }
+
+                return ();
+
+            }
+
+        }
+
+
+                    //====================================== End Helper Functions ======================================
+                }
 }
