@@ -25,10 +25,7 @@ namespace BangazonWorkforce.Controllers
 
         public SqlConnection Connection
         {
-            get
-            {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            }
+            get { return new SqlConnection(_configuration.GetConnectionString("DefaultConnection")); }
         }
 
         // GET: Employees
@@ -62,7 +59,7 @@ namespace BangazonWorkforce.Controllers
                                 Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                             }
                         };
-                    employees.Add(employee);
+                        employees.Add(employee);
                     }
 
                     reader.Close();
@@ -114,10 +111,12 @@ namespace BangazonWorkforce.Controllers
                 return View(model);
             }
         }
+
         //================= END A.C. CODE ======================
 
 
         //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+
 
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
@@ -202,13 +201,9 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
-
-          
-        
+ 
         //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
-
-          
 
         //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
@@ -235,12 +230,12 @@ namespace BangazonWorkforce.Controllers
 
                     while (reader.Read())
                     {
-                        CurrentEmpTP.Add (new TrainingProgram
+                        CurrentEmpTP.Add(new TrainingProgram
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("id")),
                             Name = reader.GetString(reader.GetOrdinal("name")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
-                         
+
                         });
 
 
@@ -350,7 +345,8 @@ namespace BangazonWorkforce.Controllers
 
                             if (!reader.IsDBNull(reader.GetOrdinal("Employee Training Id")))
                             {
-                                if (!employee.TrainingProgramList.Exists(tp => tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
+                                if (!employee.TrainingProgramList.Exists(tp =>
+                                    tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
                                 {
                                     TrainingProgram trainingProgram = new TrainingProgram
                                     {
@@ -362,6 +358,7 @@ namespace BangazonWorkforce.Controllers
                                 }
                             }
                         }
+
                         //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
                         //DecommissionDate
                     }
@@ -376,6 +373,9 @@ namespace BangazonWorkforce.Controllers
         //=======================================================================================
         //End HANNAH Get Details
         //=======================================================================================
+
+
+
 
 
 
@@ -426,17 +426,6 @@ namespace BangazonWorkforce.Controllers
                             }
                         };
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("computerId")))
-                        {
-                            employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("computerId"));
-                            employee.Computer = new Computer
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Make = reader.GetString(reader.GetOrdinal("make")),
-                                Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
-                            };
-                        }
-
                         //if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
                         //{
                         //    employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
@@ -448,6 +437,17 @@ namespace BangazonWorkforce.Controllers
                         //    };
                         //}
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
+                        {
+                            employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
+                            employee.TrainingProgram = new TrainingProgram
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
+                            };
+                        }
+
                     }
 
                     reader.Close();
@@ -458,7 +458,7 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
+
 
         //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // JD - Wrote this for grabbing all instances of departments for employee views.
@@ -466,64 +466,64 @@ namespace BangazonWorkforce.Controllers
         {
             using (SqlConnection conn = Connection)
             {
-                
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, name from Department;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> departments = new List<Department>();
+
+                    while (reader.Read())
                     {
-                        cmd.CommandText = @"SELECT id, name from Department;";
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                        List<Department> departments = new List<Department>();
-
-                        while (reader.Read())
+                        departments.Add(new Department
                         {
-                            departments.Add(new Department
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return departments;
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name"))
+                        });
                     }
-                
+
+                    reader.Close();
+
+                    return departments;
+                }
+
+
             }
+        }
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+
+        private List<TrainingProgram> GetAllTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, name from TrainingProgram;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        trainingPrograms.Add(new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return trainingPrograms;
+                }
+            }
+
         }
         //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
-        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
-      
-            private List<TrainingProgram> GetAllTrainingPrograms()
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"SELECT id, name from TrainingProgram;";
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                        List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
-
-                        while (reader.Read())
-                        {
-                            trainingPrograms.Add(new TrainingProgram()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return trainingPrograms;
-                    }
-                }
-
-            }
-        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
 
 
@@ -532,32 +532,38 @@ namespace BangazonWorkforce.Controllers
         {
             using (SqlConnection conn = Connection)
             {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, make from Computer;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Computer> computers = new List<Computer>();
+
+                    while (reader.Read())
                     {
-                        cmd.CommandText = @"SELECT id, make from Computer;";
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                        List<Computer> computers = new List<Computer>();
-
-                        while (reader.Read())
+                        computers.Add(new Computer()
                         {
-                            computers.Add(new Computer()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Make = reader.GetString(reader.GetOrdinal("make"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return computers;
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("make"))
+                        });
                     }
-                
 
+
+                    reader.Close();
+
+                    return computers;
+                }
             }
-        
-         }
-        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
+
+        }
+
+
     }
-}    
+
+}
+        
+    
+
+
+

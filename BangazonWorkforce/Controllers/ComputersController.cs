@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
 
+
 namespace BangazonWorkforce.Controllers
 {
 
