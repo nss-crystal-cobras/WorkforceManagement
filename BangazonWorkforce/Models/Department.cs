@@ -30,5 +30,6 @@ namespace BangazonWorkforce.Models
                 return EmployeeList.Count();
             }
         }
+        
     }
 }

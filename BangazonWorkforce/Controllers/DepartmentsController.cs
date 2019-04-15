@@ -75,24 +75,8 @@ namespace BangazonWorkforce.Controllers
                                 newDepartment.EmployeeList = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
                             }
 
-                            
-
                             departments.Add(DepartmentId, newDepartment);
                         }
-
-                        //logic for if DB doesn't include any employees; execute logic if DB is not null
-                        //add employee to EmployeeIdList within Department class
-                        //if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
-                        //{
-                        //    Department currentDepartment = departments[DepartmentId];
-                        //    currentDepartment.EmployeeList.Add(
-                        //        new Employee
-                        //        {
-                        //            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                        //            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                        //            LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                        //        });
-                        //}
                     }
 
                     reader.Close();
@@ -111,6 +95,7 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    //doesn't return any data at all while dept ID = 6
                     cmd.CommandText = @"
                         SELECT d.Id AS DepartmentId, 
                             d.[Name], 
@@ -118,8 +103,8 @@ namespace BangazonWorkforce.Controllers
                             e.FirstName, 
                             e.LastName
                         FROM Department d 
-                        LEFT JOIN Employee e on e.DepartmentId = DepartmentId
-                        WHERE DepartmentId = @id";
+                        LEFT JOIN Employee e on e.DepartmentId = d.Id
+                        WHERE d.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -157,7 +142,7 @@ namespace BangazonWorkforce.Controllers
                             } 
                         } else
                         {
-                            return NotFound();
+                            return View(department);
                         }
                     }
                     reader.Close();
