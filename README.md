@@ -33,7 +33,7 @@ and most powerful commericial platform for individuals all around the globe.
 - User can create a new department; creation form allows user to enter new department name
 ### Details
 - Author: Allison Collins
-- From details view, user can view list of all employees currently assigned to each department 
+- From details view, user can view department budget and list of all employees currently assigned to each department 
 
 ## Computer Resource
 - Author: JD Wheeler
@@ -50,7 +50,7 @@ and most powerful commericial platform for individuals all around the globe.
 ### Index
 - Author: Dan Brewer
 - User can see a list of all training programs that have not taken place yet
-## Create
+### Create
 - Author: Dan Brewer
 - User can create a new training program; creation form allows user to enter program title, start date, end date, and maximum number of employees
 
