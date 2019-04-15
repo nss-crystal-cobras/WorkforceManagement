@@ -16,7 +16,7 @@ namespace BangazonWorkforce.Models
         public DateTime PurchaseDate { get; set; }
         [Display(Name = "Decommission Date")]
         public DateTime? DecommissionDate { get; set; }
-        [Display(Name = "Make")]
+
         public string Make { get; set; }
         public Employee Employee { get; set; }
         [Display(Name = "Manufacturer")]
