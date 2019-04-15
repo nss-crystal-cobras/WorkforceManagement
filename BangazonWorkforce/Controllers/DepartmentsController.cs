@@ -29,8 +29,8 @@ namespace BangazonWorkforce.Controllers
                 return new SqlConnection(connectionString);
             }
         }
-        // GET: Departments
         //================= AUTHOR: ALLISON COLLINS ======================
+        // GET: Departments
         // dept name, dept budget, size of dept (number of employees assigned)
         public ActionResult Index()
         {
@@ -41,8 +41,14 @@ namespace BangazonWorkforce.Controllers
                 //join tables by department id within employee object to id within department object
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, d.[Name], d.Budget, e.Id AS EmployeeId, e.FirstName, e.LastName
-                                      FROM Department d LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
+                    cmd.CommandText = @"SELECT d.Id AS DepartmentId, 
+                                        d.[Name], 
+                                        d.Budget, 
+                                        e.Id AS EmployeeId, 
+                                        e.FirstName, 
+                                        e.LastName
+                                      FROM Department d 
+                                      LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     //dictionary lets us add department id to newly created department
@@ -52,35 +58,26 @@ namespace BangazonWorkforce.Controllers
                     {
                         int DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
 
-                        //why does this work?
-                        if(!departments.ContainsKey(DepartmentId))
+                        //why does this work? -> won't each department contain an Id no matter what?
+                        if (!departments.ContainsKey(DepartmentId))
                         {
-                        Department newDepartment = new Department
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                        };
+                            Department newDepartment = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            };
 
-                        departments.Add(DepartmentId, newDepartment);
-                        }
+                            List<Employee> employees = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
 
+                            if(employees.Count() > 0)
+                            {
+                                newDepartment.EmployeeList = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
+                            }
 
-                        //logic for if DB doesn't include any employees; execute logic if DB is not null
-                        //add employee to EmployeeIdList within Department class
-                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
-                        {
-                            Department currentDepartment = departments[DepartmentId];
-                            currentDepartment.EmployeeIdList.Add(
-                                new Employee
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                });
+                            departments.Add(DepartmentId, newDepartment);
                         }
                     }
-
 
                     reader.Close();
                     //return department dictionary, which holds a list
@@ -88,7 +85,72 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
-        //========== END A.C. CODE ==============
+        // =================== GET: Departments/Details/5 ================================
+        // header: dept name
+        // list of employees
+        public ActionResult Details(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    //doesn't return any data at all while dept ID = 6
+                    cmd.CommandText = @"
+                        SELECT d.Id AS DepartmentId, 
+                            d.[Name], 
+                            e.Id AS EmployeeId, 
+                            e.FirstName, 
+                            e.LastName
+                        FROM Department d 
+                        LEFT JOIN Employee e on e.DepartmentId = d.Id
+                        WHERE d.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Department department = null;
+
+                    //have declared object to be null; as long as this is the case, execute following logic
+                    while (reader.Read())
+                    {
+                        if (department == null)
+                        {
+                            //instance of dept object
+                            department = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                            };
+                        }
+
+                        //if DB is not null, fetch employee info
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            int employeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
+                            //Any() method determines if a matching element exists in a collection
+                            //EmployeeList defined in Department.cs
+                            //looking for existing employee in list; if no instance of current employee is in list, create it here
+                            if (!department.EmployeeList.Any(e => e.Id == employeeId))
+                            {
+                                Employee employee = new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                };
+                                department.EmployeeList.Add(employee);
+                            } 
+                        } else
+                        {
+                            return View(department);
+                        }
+                    }
+                    reader.Close();
+                    return View(department);
+                }
+            }
+        }
+            //========== END A.C. CODE ==============
 
 
 //================================= AUTHOR: DANIEL BREWER ========================================= 
@@ -130,5 +192,42 @@ namespace BangazonWorkforce.Controllers
             }
         }
         //============================= End of DB Code =======================================
+
+        //AC - use logic for Dept index
+        private List<Employee> GetEmployeesByDepartmentId(int DepartmentId)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT e.Id AS EmployeeId,
+                            e.FirstName, 
+                            e.LastName
+                        FROM Employee e
+                        LEFT JOIN Department d on e.DepartmentId = d.id
+                        WHERE e.DepartmentId = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", DepartmentId));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Employee> employees = new List<Employee>();
+
+                    while (reader.Read())
+                    {
+                        employees.Add(new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return employees;
+                }
+            }
+        }
     }
 }

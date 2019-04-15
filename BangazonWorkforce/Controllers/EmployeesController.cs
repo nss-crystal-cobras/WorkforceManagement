@@ -71,7 +71,7 @@ namespace BangazonWorkforce.Controllers
         }
 
 
-        //===== AUTHOR: ALLISON COLLINS =========
+        //================= AUTHOR: ALLISON COLLINS ======================
 
         // GET: Employees/Create
         public ActionResult Create()
@@ -114,10 +114,8 @@ namespace BangazonWorkforce.Controllers
                 return View(model);
             }
         }
-        //========== END A.C. CODE ====================
 
-
-
+        //================= END A.C. CODE ======================
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {

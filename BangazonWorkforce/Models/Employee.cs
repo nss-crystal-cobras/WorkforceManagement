@@ -8,8 +8,23 @@ namespace BangazonWorkforce.Models
     public class Employee
     {
         public int Id { get; set; }
+
+        [Required]
+        [MaxLength(55)]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
+
+        [Required]
+        [MaxLength(55)]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
+
+        [Required]
         public bool IsSupervisor { get; set; }
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
