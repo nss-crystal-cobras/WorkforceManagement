@@ -123,11 +123,6 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-        private TrainingProgram GetTrainingProgramById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
         // POST: Instructor/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -138,7 +133,8 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"DELETE FROM TrainingProgram WHERE Id = @id";
+                    cmd.CommandText = @"DELETE From EmployeeTraining Where TrainingProgramId = @id;
+                                        DELETE FROM TrainingProgram WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     cmd.ExecuteNonQuery();
                     return RedirectToAction(nameof(Index));
@@ -147,82 +143,44 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-        //private TrainingProgram GetTrainingProgramById(int id)
-        //{
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
-        //                                               t.Name, t.StartDate, 
-        //                                               t.EndDate, t.MaxAttendees,
-        //                                          FROM TrainingProgram t 
-        //                                         WHERE  t.Id = @id";
-        //            cmd.Parameters.Add(new SqlParameter("@id", id));
-        //            SqlDataReader reader = cmd.ExecuteReader();
-
-        //            TrainingProgram trainingProgram = null;
-
-        //            if (reader.Read())
-        //            {
-        //                trainingProgram = new TrainingProgram
-        //                { 
-        //                cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name)),
-        //                cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate)),
-        //                cmd.Parameters.Add(new SqlParameter("@enddate", trainingProgram.EndDate)),
-        //                cmd.Parameters.Add(new SqlParameter("@maxattendees", trainingProgram.MaxAttendees));
-        //            };
-        //            reader.Close();
-
-        //            return trainingProgram;
-        //        }
-
-
-
-        //    }
-
-        //}
-
-
-        //============================= End of DB Code =======================================
-        private TrainingProgram GetAllTrainingProgramsById(int id)
+        private TrainingProgram GetTrainingProgramById(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Name AS 'Training Program', StartDate AS 'Training Program Start',
-                                      EndDate AS 'Training Program End', MaxAttendees AS 'Max Attendees'
-                                      FROM TrainingProgram 
-                                    WHERE id = @id;";
+                    cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
+                                               t.Name, t.StartDate, 
+                                               t.EndDate, t.MaxAttendees
+                                               FROM TrainingProgram t 
+                                               WHERE  t.Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    //List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
-
-                    TrainingProgram singleTrainingProgram = null;
+                    TrainingProgram trainingProgram = null;
 
                     if (reader.Read())
                     {
-                        //trainingProgram.Add(new TrainingProgram
-
-                        singleTrainingProgram = new TrainingProgram
+                        trainingProgram = new TrainingProgram
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
                             EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
+
                         };
                     }
+
                     reader.Close();
-                    return singleTrainingProgram;
+
+                    return trainingProgram;
                 }
             }
+
         }
 
-
+        //============================= End of DB Code =======================================
     }
 }
