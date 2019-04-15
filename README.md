@@ -1,10 +1,10 @@
 # Bangazon E Commerce
 Bangazon Inc. welcomes us to the team. we've been selected from a deep pool of candidates
 to help build the next, disruptive online platform. Our goal is to become the most personalized, 
-and most powerful commericial platform for individuals all around the globe.
+and most powerful commercial platform for individuals all around the globe.
 
 ## Team Goals
-- Utilize ASP.NET MVC capabilities to create single-page application displaying and modifying the company's workforce'
+- Utilize ASP.NET MVC capabilities to create a single-page application displaying and modifying the company's workforce
 - Use a navigation bar to view and modify each resource making up the Bangazon WorkForce
 - Utilize ADO.NET to communicate with Database
 - Write specific controllers building out our API's
@@ -13,13 +13,13 @@ and most powerful commericial platform for individuals all around the globe.
 ## Employee Resource
 ### Index
 - Author: Dan Brewer
-- User can see list of first name, last name, and department of each employee
+- User can see list of employees that includes the employee's first name, last name, and department of each employee
 ### Create
 - Author: Allison Collins
 - User can add a new employee, determining first name, last name, indicating whether employee is a supervisor, and select a department from a drop-down menu
 ### Details
 - Author: Hannah Neal
-- From details view, user can view employee first and last name, department, currently assigned computer, and training programs they have attended or plan on attending
+- From employee details view, the user can view employee first and last name, department, currently assigned computer, and training programs they have attended or plan on attending
 ### Edit
 - Author: JD Wheeler
 - From the employee details view, user can modify first and last name, department, training programs, and current computer

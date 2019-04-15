@@ -111,6 +111,23 @@ namespace BangazonWorkforce.Controllers
         }
         //============================= End of DB Code =======================================
 
+        //============================= Start HN Code: Ticket #10 ============================
+        // Training Programs: Details and Edit
 
+        /*
+                 Given user is viewing the list of training programs
+                When the user clicks on a training program
+                Then the user should see all details of that training program
+                And any employees that are currently attending the program
+
+                Given user is viewing the details of a training program
+                When the user clicks on the edit link
+                Then the user should be presented with a form that allows the user to edit any property of the training program unless the training program has already taken place
+         */
+
+
+
+
+        // ============================= End HN Code ========================================
     }
 }
