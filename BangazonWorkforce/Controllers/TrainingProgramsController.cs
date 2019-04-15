@@ -10,42 +10,42 @@ using Microsoft.Extensions.Configuration;
 
 namespace BangazonWorkforce.Controllers
 {
-   
-        // GET: TrainingPrograms
-        public class TrainingProgramsController : Controller
+
+    // GET: TrainingPrograms
+    public class TrainingProgramsController : Controller
+    {
+        private readonly IConfiguration _configuration;
+
+        public TrainingProgramsController(IConfiguration configuration)
         {
-                private readonly IConfiguration _configuration;
+            this._configuration = configuration;
+        }
 
-                public TrainingProgramsController(IConfiguration configuration)
+        public SqlConnection Connection
+        {
+            get
+            {
+                string connectionString = _configuration.GetConnectionString("DefaultConnection");
+                return new SqlConnection(connectionString);
+            }
+        }
+        // GET: TrainingPrograms
+        public ActionResult Index()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    this._configuration = configuration;
-                }
-
-                public SqlConnection Connection
-                {
-                    get
-                    {
-                        string connectionString = _configuration.GetConnectionString("DefaultConnection");
-                        return new SqlConnection(connectionString);
-                    }
-                }
-                // GET: TrainingPrograms
-                public ActionResult Index()
-                {
-                    using (SqlConnection conn = Connection)
-                    {
-                        conn.Open();
-                        using (SqlCommand cmd = conn.CreateCommand())
-                        {
-                            cmd.CommandText = @"SELECT name, startdate,
+                    cmd.CommandText = @"SELECT name, startdate,
                                       enddate, maxattendees
                                       FROM TrainingProgram;";
-                            SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-                            List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
-                    
-                           /* set variable to timestamp here */
-                           DateTime CurrentDate = DateTime.Now;
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    /* set variable to timestamp here */
+                    DateTime CurrentDate = DateTime.Now;
 
                     while (reader.Read())
                     {
@@ -64,11 +64,11 @@ namespace BangazonWorkforce.Controllers
                         }
                     }
 
-                            reader.Close();
-                            return View(trainingPrograms);
-                        }
-                    }
+                    reader.Close();
+                    return View(trainingPrograms);
                 }
+            }
+        }
 
         //================================= AUTHOR: DANIEL BREWER ========================================= 
         // GET: Departments/Create
@@ -91,7 +91,7 @@ namespace BangazonWorkforce.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees)
-                                          VALUES (@name, @startdate, @enddate, @maxattendees)";
+                                                  VALUES (@name, @startdate, @enddate, @maxattendees)";
 
                         cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name));
                         cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate));
@@ -123,6 +123,11 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
+        private TrainingProgram GetTrainingProgramById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         // POST: Instructor/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -141,40 +146,83 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
-        private TrainingProgram GetTrainingProgramById(int id)
+
+        //private TrainingProgram GetTrainingProgramById(int id)
+        //{
+        //    using (SqlConnection conn = Connection)
+        //    {
+        //        conn.Open();
+        //        using (SqlCommand cmd = conn.CreateCommand())
+        //        {
+        //            cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
+        //                                               t.Name, t.StartDate, 
+        //                                               t.EndDate, t.MaxAttendees,
+        //                                          FROM TrainingProgram t 
+        //                                         WHERE  t.Id = @id";
+        //            cmd.Parameters.Add(new SqlParameter("@id", id));
+        //            SqlDataReader reader = cmd.ExecuteReader();
+
+        //            TrainingProgram trainingProgram = null;
+
+        //            if (reader.Read())
+        //            {
+        //                trainingProgram = new TrainingProgram
+        //                { 
+        //                cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name)),
+        //                cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate)),
+        //                cmd.Parameters.Add(new SqlParameter("@enddate", trainingProgram.EndDate)),
+        //                cmd.Parameters.Add(new SqlParameter("@maxattendees", trainingProgram.MaxAttendees));
+        //            };
+        //            reader.Close();
+
+        //            return trainingProgram;
+        //        }
+
+
+
+        //    }
+
+        //}
+
+
+        //============================= End of DB Code =======================================
+        private TrainingProgram GetAllTrainingProgramsById(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
-                                               t.Name, t.StartDate, 
-                                               t.EndDate, t.MaxAttendees,
-                                          FROM TrainingProgram t 
-                                         WHERE  t.Id = @id";
+                    cmd.CommandText = @"SELECT Name AS 'Training Program', StartDate AS 'Training Program Start',
+                                      EndDate AS 'Training Program End', MaxAttendees AS 'Max Attendees'
+                                      FROM TrainingProgram 
+                                    WHERE id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    TrainingProgram trainingProgram = null;
+                    //List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    TrainingProgram singleTrainingProgram = null;
 
                     if (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram
+                        //trainingProgram.Add(new TrainingProgram
+
+                        singleTrainingProgram = new TrainingProgram
                         {
-                        cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name));
-                        cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate));
-                        cmd.Parameters.Add(new SqlParameter("@enddate", trainingProgram.EndDate));
-                        cmd.Parameters.Add(new SqlParameter("@maxattendees", trainingProgram.MaxAttendees));
-                    };
-
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+                    }
                     reader.Close();
-
-                    return trainingProgram;
+                    return singleTrainingProgram;
                 }
             }
-            //============================= End of DB Code =======================================
-
-
         }
+
+
+    }
 }
