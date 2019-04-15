@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+
 namespace BangazonWorkforce.Controllers
 {
 
@@ -127,7 +128,7 @@ namespace BangazonWorkforce.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"INSERT INTO computer (Make, Manufacturer, PurchaseDate)
-                                             VALUES (@make, @manufacturer, @purchasedate)";
+                                            VALUES (@make, @manufacturer, @purchasedate)";
 
                         cmd.Parameters.Add(new SqlParameter("@make", computer.Make));
                         cmd.Parameters.Add(new SqlParameter("@manufacturer", computer.Manufacturer));

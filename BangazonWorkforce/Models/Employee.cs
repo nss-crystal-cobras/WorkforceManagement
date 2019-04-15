@@ -8,12 +8,13 @@ namespace BangazonWorkforce.Models
 {
     public class Employee
     {
-        [Required]
         public int Id { get; set; }
+
         [Required]
         [MaxLength(55)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
+
         [Required]
         [MaxLength(55)]
         [Display(Name = "Last Name")]
@@ -26,12 +27,15 @@ namespace BangazonWorkforce.Models
                 return $"{FirstName} {LastName}";
             }
         }
+        
         [Required]
         public bool IsSupervisor { get; set; }
-        [Required]
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         public Computer Computer { get; set; } = new Computer();
-        public TrainingProgram TrainingProgram { get; set; } = new TrainingProgram();
+
+        public List<TrainingProgram> TrainingProgramList { get; set; }
+        public TrainingProgram TrainingProgram { get; set; }
+        public List<TrainingProgram> EmployeeTraining { get; set; }
     }
 }

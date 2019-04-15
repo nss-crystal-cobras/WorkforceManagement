@@ -10,6 +10,7 @@ namespace BangazonWorkforce.Models
     {
         //Added display's for the names.-JD
 
+        [Display (Name = "Computer Id")]
         public int Id { get; set; }
         [Display(Name = "Purchase Date")]
         public DateTime PurchaseDate { get; set; }
