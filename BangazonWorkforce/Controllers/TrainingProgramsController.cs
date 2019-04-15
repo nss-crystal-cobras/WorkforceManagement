@@ -109,8 +109,72 @@ namespace BangazonWorkforce.Controllers
                 return View(trainingProgram);
             }
         }
-        //============================= End of DB Code =======================================
+        // GET: Instructor/Delete/5
+        public ActionResult Delete(int id)
+        {
+            TrainingProgram trainingProgram = GetTrainingProgramById(id);
+            if (trainingProgram == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return View(trainingProgram);
+            }
+        }
+
+        // POST: Instructor/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, TrainingProgram trainingProgram)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM TrainingProgram WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    cmd.ExecuteNonQuery();
+                    return RedirectToAction(nameof(Index));
+
+                }
+            }
+        }
+        private TrainingProgram GetTrainingProgramById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
+                                               t.Name, t.StartDate, 
+                                               t.EndDate, t.MaxAttendees,
+                                          FROM TrainingProgram t 
+                                         WHERE  t.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    TrainingProgram trainingProgram = null;
+
+                    if (reader.Read())
+                    {
+                        trainingProgram = new TrainingProgram
+                        {
+                        cmd.Parameters.Add(new SqlParameter("@name", trainingProgram.Name));
+                        cmd.Parameters.Add(new SqlParameter("@startdate", trainingProgram.StartDate));
+                        cmd.Parameters.Add(new SqlParameter("@enddate", trainingProgram.EndDate));
+                        cmd.Parameters.Add(new SqlParameter("@maxattendees", trainingProgram.MaxAttendees));
+                    };
+
+                    reader.Close();
+
+                    return trainingProgram;
+                }
+            }
+            //============================= End of DB Code =======================================
 
 
-    }
+        }
 }
