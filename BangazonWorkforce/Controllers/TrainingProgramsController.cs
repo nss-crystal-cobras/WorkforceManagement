@@ -37,7 +37,7 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT name, startdate,
+                    cmd.CommandText = @"SELECT Id, name, startdate,
                                       enddate, maxattendees
                                       FROM TrainingProgram;";
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -51,6 +51,7 @@ namespace BangazonWorkforce.Controllers
                     {
                         TrainingProgram trainingProgram = new TrainingProgram
                         {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
                             EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
@@ -150,11 +151,11 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT t.Id AS TrainingProgramId,
+                    cmd.CommandText = @"SELECT Id AS TrainingProgramId,
                                                t.Name, t.StartDate, 
                                                t.EndDate, t.MaxAttendees
                                                FROM TrainingProgram t 
-                                               WHERE  t.Id = @id;";
+                                               WHERE  Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
