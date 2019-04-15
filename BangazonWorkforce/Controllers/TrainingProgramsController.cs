@@ -128,6 +128,50 @@ namespace BangazonWorkforce.Controllers
 
 
 
-        // ============================= End HN Code ========================================
+        // ============================= End HN Code ============================================
+
+        //=============================== Helper Functions =======================================
+
+
+        // This grabs ALL the Training Programs with ALL OF their respective data from the database:
+        //private List<TrainingProgram> GetAllTrainingProgramsById(int id)
+        private TrainingProgram GetAllTrainingProgramsById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Name AS 'Training Program', StartDate AS 'Training Program Start',
+                                      EndDate AS 'Training Program End', MaxAttendees AS 'Max Attendees'
+                                      FROM TrainingProgram 
+                                    WHERE id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    //List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    TrainingProgram singleTrainingProgram = null;
+
+                    if (reader.Read())
+                    {
+                        //trainingProgram.Add(new TrainingProgram
+
+                        singleTrainingProgram = new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+                    }
+                    reader.Close();
+                    return singleTrainingProgram;
+                }
+            }
+        }
+
+        //====================================== End Helper Functions ======================================
     }
 }
