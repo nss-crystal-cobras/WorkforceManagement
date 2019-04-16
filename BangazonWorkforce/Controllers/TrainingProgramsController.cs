@@ -326,38 +326,38 @@ namespace BangazonWorkforce.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, TrainingProgram trainingProgram)
+        public ActionResult Edit(int id, TrainingProgram singleTrainingProgram)
         {
-            try
-            {
+            //try
+            //{
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE TrainingProgram
-                                            SET Name = @Name,
-                                                StartDate = @StartDate,
-                                                EndDate = @EndDate,
-                                                MaxAttendees = @MaxAttendees
-                                            WHERE Id = @id";
+                        cmd.CommandText = @"UPDATE TrainingProgram tp
+                                            SET tp.[Name] = @Name,
+                                                tp.StartDate = @StartDate,
+                                                tp.EndDate = @EndDate,
+                                                tp.MaxAttendees = @MaxAttendees
+                                            WHERE tp.Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
-                        cmd.Parameters.Add(new SqlParameter("@Name", trainingProgram.Name));
-                        cmd.Parameters.Add(new SqlParameter("@StartDate", trainingProgram.StartDate));
-                        cmd.Parameters.Add(new SqlParameter("@EndDate", trainingProgram.EndDate));
-                        cmd.Parameters.Add(new SqlParameter("@MaxAttendees", trainingProgram.MaxAttendees));
+                        cmd.Parameters.Add(new SqlParameter("@Name", singleTrainingProgram.Name));
+                        cmd.Parameters.Add(new SqlParameter("@StartDate", singleTrainingProgram.StartDate));
+                        cmd.Parameters.Add(new SqlParameter("@EndDate", singleTrainingProgram.EndDate));
+                        cmd.Parameters.Add(new SqlParameter("@MaxAttendees", singleTrainingProgram.MaxAttendees));
 
                         cmd.ExecuteNonQuery();
 
                         return RedirectToAction(nameof(Index));
                     }
                 }
-            }
-            catch
-            {
-                return View(trainingProgram);
-            }
-        }
+    //    }
+    //        catch
+    //        {
+    //            return View(trainingProgram);
+    //}
+}
 
 
 
