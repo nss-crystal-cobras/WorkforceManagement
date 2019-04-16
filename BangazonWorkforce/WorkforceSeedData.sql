@@ -17,27 +17,27 @@ INSERT INTO Employee (FirstName, LastName, DepartmentId, IsSuperVisor)
 
 INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer)
 	VALUES ('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
-			('2015-10-20 00:00:00', null, 'Inspiron', 'Dell'),
+			('2015-10-20 00:00:00', null, 'Surface', 'Microsoft'),
+			('2015-10-20 00:00:00', null, 'XPS', 'Dell'),
+			('2015-10-20 00:00:00', null, 'PixelBook', 'Google'),
+			('2015-10-20 00:00:00', null, 'YOga', 'HP'),
+			('2015-10-20 00:00:00', null, 'Toughbook', 'Lenovo'),
+			('2015-10-20 00:00:00', null, 'Viao', 'Sony'),
+			('2015-10-20 00:00:00', null, 'Alienware', 'Dell'),
+			('2018-01-30 00:00:00', null, 'Macbook Pro', 'Apple'),
+			('2018-01-30 00:00:00', null, 'Macbook Air', 'Apple'),
 			('2018-01-30 00:00:00', null, 'Macbook', 'Apple'),
-			('2018-01-30 00:00:00', null, 'Macbook', 'Apple'),
-			('2018-01-30 00:00:00', null, 'Macbook', 'Apple'),
-			('2018-01-30 00:00:00', null, 'Macbook', 'Apple');
+			('2018-01-30 00:00:00', null, 'Macbook Mini', 'Apple');
 
 INSERT INTO ComputerEmployee (EmployeeId, ComputerId, AssignDate, UnassignDate)
-	VALUES (1, 9, '2018-01-30 00:00:00', null),
-			(2, 10, '2018-01-30 00:00:00', null),
-			(3, 11, '2018-01-30 00:00:00', null),
-			(4, 12, '2018-01-30 00:00:00', null),
-			(5, 1, '2010-01-30 00:00:00', null),
-			(6, 2, '2010-01-30 00:00:00', null),
-			(7, 3, '2010-01-30 00:00:00', null),
-			(8, 4, '2010-01-30 00:00:00', null);
+	VALUES (1, 1, '2018-01-30 00:00:00', null),
+			(2, 2, '2018-01-30 00:00:00', null),
+			(3, 3, '2018-01-30 00:00:00', null),
+			(4, 4, '2018-01-30 00:00:00', null),
+			(5, 5, '2010-01-30 00:00:00', null),
+			(6, 6, '2010-01-30 00:00:00', null),
+			(7, 7, '2010-01-30 00:00:00', null),
+			(8, 8, '2010-01-30 00:00:00', null);
 
 INSERT INTO TrainingProgram ([Name], StartDate, EndDate, MaxAttendees)
 	VALUES ('How to Train Your Dragon', '2019-04-08 00:00:00', '2019-04-13 00:00:00', 3),
