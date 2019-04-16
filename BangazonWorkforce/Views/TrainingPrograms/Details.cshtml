@@ -1,7 +1,7 @@
 ﻿@model BangazonWorkforce.Models.TrainingProgram
 
 @{
-    ViewData["Title"] = "GetTrainingProgramDetails";
+    ViewData["Title"] = "Details";
 }
 
 <h1>GetTrainingProgramDetails</h1>
@@ -74,7 +74,8 @@
         }
     </dl>
 </div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
+<div class="mb-2">
+    @Html.ActionLink("Edit", "Edit", new { Model.Id }) |
+    @Html.ActionLink("Delete", "Delete", new { id = Model.Id })
 </div>
+    <a asp-action="Index">Back to List</a>

@@ -243,7 +243,7 @@ namespace BangazonWorkforce.Controllers
         // Get EmployeeTraining + TrainingProgram + Employee
         // Join Employee to TrainingProgram on  EmployeeTraining
 
-        public ActionResult GetTrainingProgramDetails(int id)
+        public ActionResult Details(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -267,7 +267,7 @@ namespace BangazonWorkforce.Controllers
                                         LEFT JOIN Employee e ON e.Id = et.EmployeeId
                                         WHERE tp.Id = @id";
 
-                    cmd.Parameters.Add(new SqlParameter("@Id", id));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     TrainingProgram singleTrainingProgram = null;
