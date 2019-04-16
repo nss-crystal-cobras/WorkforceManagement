@@ -50,12 +50,9 @@ and most powerful commericial platform for individuals all around the globe.
 ### Index (Future Programs)
 - Author: Dan Brewer
 - User can see a list of all training programs that have not taken place yet
-<<<<<<< HEAD
 ### Index (Past Programs)
 - Author: Allison Collins
 - From the Future Programs index page, user can click link to view past programs
-=======
->>>>>>> master
 ### Create
 - Author: Dan Brewer
 - User can create a new training program; creation form allows user to enter program title, start date, end date, and maximum number of employees
