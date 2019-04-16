@@ -196,7 +196,10 @@ namespace BangazonWorkforce.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                     cmd.CommandText = "DELETE FROM computer WHERE id = @id;";
+                     cmd.CommandText = @"DELETE FROM Computer
+                                        WHERE Id = @id
+                                        AND NOT EXISTS (SELECT * FROM [ComputerEmployee]
+                                        WHERE ComputerId = @id)";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         cmd.ExecuteNonQuery();
