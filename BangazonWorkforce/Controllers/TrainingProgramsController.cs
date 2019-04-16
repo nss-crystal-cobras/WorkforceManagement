@@ -322,33 +322,46 @@ namespace BangazonWorkforce.Controllers
 
         public ActionResult Edit(int id)
         {
-            TrainingProgram trainingProgram = GetTrainingProgramByIdToEdit(id);
-            if (trainingProgram == null)
+            TrainingProgram singleTrainingProgram = GetTrainingProgramByIdToEdit(id);
+            if (singleTrainingProgram == null)
             {
                 return NotFound();
             }
 
-            return View(trainingProgram);
+            return View(singleTrainingProgram);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, TrainingProgram singleTrainingProgram)
         {
-            try
-            {
+            //try
+            //{
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE TrainingProgram tp
-                                            SET tp.[Name] = @Name,
-                                                tp.StartDate = @StartDate,
-                                                tp.EndDate = @EndDate,
-                                                tp.MaxAttendees = @MaxAttendees
-                                            WHERE tp.Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.CommandText = @"UPDATE TrainingProgram
+                                            SET Name = @Name,
+                                                StartDate = @StartDate,
+                                                EndDate = @EndDate,
+                                                MaxAttendees = @MaxAttendees
+                                            WHERE Id = @id";
+
+                    /*
+                    //NOTE: The SQL query below did not work. I'm not totally sure why. 
+
+                        //@"UPDATE t.id TrainingProgram tp
+                        //                    SET tp.Name = @Name,
+                        //                        tp.StartDate = @StartDate,
+                        //                        tp.EndDate = @EndDate,
+                        //                        tp.MaxAttendees = @MaxAttendees
+                        //                    WHERE tp.id = @id";
+
+                    */
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                         cmd.Parameters.Add(new SqlParameter("@Name", singleTrainingProgram.Name));
                         cmd.Parameters.Add(new SqlParameter("@StartDate", singleTrainingProgram.StartDate));
                         cmd.Parameters.Add(new SqlParameter("@EndDate", singleTrainingProgram.EndDate));
@@ -359,11 +372,11 @@ namespace BangazonWorkforce.Controllers
                         return RedirectToAction(nameof(Index));
                     }
                 }
-        }
-            catch
-            {
-                return View(singleTrainingProgram);
-    }
+        //}
+    //        catch
+    //        {
+    //            return View(singleTrainingProgram);
+    //}
 }
 
 
