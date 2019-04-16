@@ -32,7 +32,7 @@ namespace BangazonWorkforce.Models
         public bool IsSupervisor { get; set; }
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
-        public Computer Computer { get; set; } = new Computer();
+        public Computer Computer { get; set; }
 
         public List<TrainingProgram> TrainingProgramList { get; set; }
         public TrainingProgram TrainingProgram { get; set; }

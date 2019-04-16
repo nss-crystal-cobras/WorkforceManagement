@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 namespace BangazonWorkforce.Models.ViewModels
 {
-    public class ComputerCreateViewModel
-    {
+    public class ComputerDeleteViewModel
+    { 
+       public Computer Computer { get; set; }
+        
     }
 }

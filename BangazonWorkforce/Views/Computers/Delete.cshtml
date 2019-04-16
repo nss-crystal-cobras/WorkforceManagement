@@ -1,4 +1,4 @@
-﻿@model BangazonWorkforce.Models.Computer
+﻿@model BangazonWorkforce.Models.ViewModels.ComputerDeleteViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -8,29 +8,41 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Computer</h4>
+    <h4>ComputerDeleteViewModel</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PurchaseDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PurchaseDate)
-        </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Computer.Make)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Computer.Make)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Computer.Manufacturer)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Computer.Manufacturer)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Computer.PurchaseDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Computer.PurchaseDate)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Computer.DecommissionDate)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Computer.DecommissionDate)
+            </dd>
+            <dt class="col-sm-2">
+                Employee Assigned
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Computer.Employee.FullName)
+            </dd>
+        </dl>
    
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Make)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Make)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Manufacturer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Manufacturer)
-        </dd>
-    </dl>
     
     <form asp-action="Delete">
         <input type="submit" value="Delete" class="btn btn-danger" /> |

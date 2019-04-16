@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonWorkforce.Models;
+using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -175,52 +176,29 @@ namespace BangazonWorkforce.Controllers
         public ActionResult Delete(int id)
         {
 
-            using (SqlConnection conn = Connection)
+            ComputerDeleteViewModel viewModel = new ComputerDeleteViewModel
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"select Make, Manufacturer, PurchaseDate 
-                                        from computer
-                                        where Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
+                Computer = GetComputerById(id)
+            };
 
-                    Computer computer = null;
-
-                    if (reader.Read())
-                    {
-                        computer = new Computer
-                        {
-                            Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
-                        };
-                    }
-                    reader.Close();
-                    return View(computer);
-                }
-            }
+            return View(viewModel);
         }
 
         // POST: Computers/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, ComputerDeleteViewModel viewModel)
         {
             try
             {
-                // TODO: Add delete logic here
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM computer 
-                                            WHERE id = @id 
-                                            AND NOT exists(select EmployeeId FROM [ComputerEmployee] 
-                                            WHERE EmployeeId = @id)";
+                     cmd.CommandText = "DELETE FROM computer WHERE id = @id;";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
+
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -229,8 +207,68 @@ namespace BangazonWorkforce.Controllers
             }
             catch
             {
-                return View();
+                return View(viewModel);
             }
         }
+
+
+
+
+        private Computer GetComputerById(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT 
+                                        c.Id,
+                                        c.Make,
+                                        c.Manufacturer,
+                                        c.PurchaseDate,
+										e.Id AS EmployeeId,
+										e.FirstName,
+                                        e.LastName
+                                        FROM Computer c
+                                        LEFT JOIN (SELECT * 
+										FROM ComputerEmployee
+										WHERE UnassignDate IS NULL)
+										ce ON c.Id = ce.ComputerId
+                                        LEFT JOIN Employee e ON ce.EmployeeId = e.Id
+                                        WHERE c.Id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    Computer computer = null;
+
+                    while (reader.Read())
+                    {
+                        computer = new Computer
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                            Employee = new Employee()
+                        };
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            computer.Employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            };
+                        };
+                    }
+                    reader.Close();
+                    return computer;
+                }
+            }
+        }
+
+
+
+
+
     }
 }
