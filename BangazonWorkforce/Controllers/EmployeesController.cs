@@ -39,9 +39,9 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"   SELECT e.Id, e.departmentId,
-          e.FirstName, e.LastName, d.name AS DepartmentName
-          FROM Employee e LEFT JOIN  Department d on d.Id = e.DepartmentId;";
+                    cmd.CommandText = @"SELECT e.Id, e.departmentId,
+                                      e.FirstName, e.LastName, d.name AS DepartmentName
+                                      FROM Employee e LEFT JOIN  Department d on d.Id = e.DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Employee> employees = new List<Employee>();
@@ -67,6 +67,8 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+
+        //======================= End of DB code =========================
 
         //================= AUTHOR: ALLISON COLLINS ======================
 
