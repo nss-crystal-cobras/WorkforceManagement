@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace BangazonWorkforce.Models.ViewModels
 {
@@ -20,6 +21,7 @@ namespace BangazonWorkforce.Models.ViewModels
         public List<TrainingProgram> TrainingPrograms { get; set; }
         public List<Computer> Computers { get; set; }
         public List<Department> Departments { get; set; }
+        [Display(Name = "Current Training Programs")]
         public List<int> SelectedTPs { get; set; }
         public List<TrainingProgram> CurrentEmpTP { get; set; }
         public int SelectedCE { get; set; }
