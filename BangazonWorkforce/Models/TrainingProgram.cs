@@ -21,7 +21,7 @@ namespace BangazonWorkforce.Models
         [Display(Name = "Training Program End Date:")]
         public DateTime EndDate { get; set; }
 
-        [Display(Name = "Program Atendees (Max):")]
+        [Display(Name = "Program Attendees (Max):")]
         public int MaxAttendees { get; set; }
 
         public List<Employee> Employees { get; set; }

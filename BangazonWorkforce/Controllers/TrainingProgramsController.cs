@@ -232,7 +232,7 @@ namespace BangazonWorkforce.Controllers
                  Given user is viewing the list of training programs
                 When the user clicks on a training program
                 Then the user should see all details of that training program
-                And any employees that are currently attending the program ---> For this, you will need to access TrainingPrograms via EmployeeTraining
+                And any employees that are currently attending the program --> For this, you will need to access TrainingPrograms via EmployeeTraining
 
                 Given user is viewing the details of a training program
                 When the user clicks on the edit link
@@ -243,6 +243,8 @@ namespace BangazonWorkforce.Controllers
         // Get EmployeeTraining + TrainingProgram + Employee
         // Join Employee to TrainingProgram on  EmployeeTraining
 
+
+        //--------------------------------------------------------------------------------------------------------------------
         public ActionResult Details(int id)
         {
             using (SqlConnection conn = Connection)
@@ -309,6 +311,55 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        //------------------------------------------------------------------------------------------------------------------------
+
+        public ActionResult Edit(int id)
+        {
+            TrainingProgram trainingProgram = GetTrainingProgramByIdToEdit(id);
+            if (trainingProgram == null)
+            {
+                return NotFound();
+            }
+
+            return View(trainingProgram);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, TrainingProgram trainingProgram)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE TrainingProgram
+                                            SET Name = @Name,
+                                                StartDate = @StartDate,
+                                                EndDate = @EndDate,
+                                                MaxAttendees = @MaxAttendees
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@Name", trainingProgram.Name));
+                        cmd.Parameters.Add(new SqlParameter("@StartDate", trainingProgram.StartDate));
+                        cmd.Parameters.Add(new SqlParameter("@EndDate", trainingProgram.EndDate));
+                        cmd.Parameters.Add(new SqlParameter("@MaxAttendees", trainingProgram.MaxAttendees));
+
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+            }
+            catch
+            {
+                return View(trainingProgram);
+            }
+        }
+
+
 
         // ============================= End HN Code ============================================
 
@@ -317,7 +368,7 @@ namespace BangazonWorkforce.Controllers
 
         // NOTE: This grabs ALL the Training Programs with ALL OF their respective data from the database:
         //private List<TrainingProgram> GetAllTrainingProgramsById(int id)
-        private TrainingProgram GetAllTrainingProgramsByIdToEdit(int id)
+        private TrainingProgram GetTrainingProgramByIdToEdit(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -331,8 +382,8 @@ namespace BangazonWorkforce.Controllers
                                             tp.EndDate AS 'Training Program End', 
                                             tp.MaxAttendees AS 'Max Attendees'
                                       FROM TrainingProgram tp
-                                      WHERE Id = @id;";
-                    cmd.Parameters.Add(new SqlParameter("@Id", id));
+                                      WHERE tp.Id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     //List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
