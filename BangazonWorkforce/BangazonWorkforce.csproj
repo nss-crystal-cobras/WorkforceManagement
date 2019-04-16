@@ -14,7 +14,7 @@
 
 
   <ItemGroup>
-    <Folder Include="Views\Computers\" />
+    <Folder Include="Views\Departments\" />
   </ItemGroup>
 
 </Project>

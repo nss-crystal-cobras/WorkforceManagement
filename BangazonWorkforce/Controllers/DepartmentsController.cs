@@ -121,7 +121,10 @@ namespace BangazonWorkforce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
+
+
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+
                             };
                         }
 

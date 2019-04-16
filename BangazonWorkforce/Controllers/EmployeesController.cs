@@ -8,6 +8,7 @@ using BangazonWorkforce.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Remotion.Linq.Clauses;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 
@@ -24,10 +25,7 @@ namespace BangazonWorkforce.Controllers
 
         public SqlConnection Connection
         {
-            get
-            {
-                return new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            }
+            get { return new SqlConnection(_configuration.GetConnectionString("DefaultConnection")); }
         }
 
         // GET: Employees
@@ -61,7 +59,7 @@ namespace BangazonWorkforce.Controllers
                                 Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                             }
                         };
-                    employees.Add(employee);
+                        employees.Add(employee);
                     }
 
                     reader.Close();
@@ -116,6 +114,10 @@ namespace BangazonWorkforce.Controllers
 
         //================= END A.C. CODE ======================
 
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+
+
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
@@ -125,69 +127,139 @@ namespace BangazonWorkforce.Controllers
                 return NotFound();
             }
 
-            //This piece of code keeps the type correct to pass into the edit
+
+            var tempTP = GetEmpTPbyId(id);
+
+            //This piece of code will set the values needed for edit. It calls on the methods written at the bottom of this controller.
             EmployeeEditViewModel viewModel = new EmployeeEditViewModel
             {
                 Departments = GetAllDepartments(),
                 TrainingPrograms = GetAllTrainingPrograms(),
+                CurrentEmpTP = GetEmpTPbyId(id),
+                SelectedTPs = tempTP.Select(tp => tp.Id).ToList(),
                 Computers = GetAllComputers(),
                 Employee = employee
             };
 
             return View(viewModel);
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
 
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EmployeeEditViewModel viewModel)
         {
-            try
+
+
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                    cmd.CommandText = @"UPDATE employee 
+                                            SET    firstname = @firstname, 
+                                                   lastname = @lastname,
+                                                   isSupervisor = @isSupervisor, 
+                                                   departmentId = @departmentId
+                                            WHERE  id = @id;
+
+                                            UPDATE computerEmployee
+                                            SET    computerId = @computerId
+                                            WHERE  employeeId = @id;
+
+                                            DELETE FROM EmployeeTraining
+                                            WHERE employeeId = @id;";
+
+
+                    cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
+                    cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
+                    cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
+                    cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.Computer.Id));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    cmd.ExecuteNonQuery();
+
+
+                    cmd.CommandText = @"INSERT INTO employeeTraining (employeeId, trainingProgramId)
+                                            VALUES ( @id, @trainingId );";
+
+                    foreach (var tpID in viewModel.SelectedTPs)
                     {
-                        cmd.CommandText = @"UPDATE employee,  
-                                           SET firstname = @firstname, 
-                                               lastname = @lastname,
-                                               isSupervisor = @isSupervisor, 
-                                               departmentId = @departmentId,
-                                             WHERE id = @id;
-
-                                            INSERT INTO employeeTraining
-                                              VALUES(@id, @trainingProgramId)
-
-                                            INSERT INTO computerEmployee
-                                             VALUES ( @id , @computerId);";
-
-                        cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.SelectedCE));
-                        cmd.Parameters.Add(new SqlParameter("@trainingProgramId", viewModel.SelectedTP));
-                        cmd.Parameters.Add(new SqlParameter("@firstname", viewModel.Employee.FirstName));
-                        cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
-                        cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
-                        cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
+                        cmd.Parameters.Clear();
+                        cmd.Parameters.Add(new SqlParameter("@trainingId", tpID));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         cmd.ExecuteNonQuery();
 
-                        return RedirectToAction(nameof(Index));
                     }
+
+
+                    return RedirectToAction(nameof(Index));
                 }
             }
-            catch
+        }
+ 
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
+
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+        // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
+        private List<TrainingProgram> GetEmpTPbyId(int id)
+        {
+            using (SqlConnection conn = Connection)
             {
-                return View(viewModel);
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT tp.id,
+                                               tp.[name],
+                                               tp.startDate    
+
+                                               FROM trainingProgram tp 
+                                               LEFT JOIN employeeTraining et ON tp.id = et.id
+                                               LEFT JOIN employee e ON et.id = e.id 
+                                               
+                                               WHERE  e.Id = @id;";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> CurrentEmpTP = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        CurrentEmpTP.Add(new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("id")),
+                            Name = reader.GetString(reader.GetOrdinal("name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("startDate")),
+
+                        });
+
+
+                    }
+
+                    reader.Close();
+
+                    return (CurrentEmpTP);
+
+                }
             }
         }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
+
+
+
         //=======================================================================================
         //Begin HANNAH Get Details
         //=======================================================================================
 
 
         // Ticket Instructions:
-        //         1. First name and last name (of Employee)
+        //        1. First name and last name (of Employee)
         //        2. Department
         //        3. Currently assigned computer
         //        4. Training programs they have attended, or plan on attending (access the list of training programs associated with the employee)
@@ -274,7 +346,8 @@ namespace BangazonWorkforce.Controllers
 
                             if (!reader.IsDBNull(reader.GetOrdinal("Employee Training Id")))
                             {
-                                if (!employee.TrainingProgramList.Exists(tp => tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
+                                if (!employee.TrainingProgramList.Exists(tp =>
+                                    tp.Id == reader.GetInt32(reader.GetOrdinal("Training Program Id"))))
                                 {
                                     TrainingProgram trainingProgram = new TrainingProgram
                                     {
@@ -286,6 +359,7 @@ namespace BangazonWorkforce.Controllers
                                 }
                             }
                         }
+
                         //AssignDate = reader.GetDateTime(reader.GetOrdinal("Computer Assigned On")),
                         //DecommissionDate
                     }
@@ -297,21 +371,24 @@ namespace BangazonWorkforce.Controllers
             }
         }
 
-            //=======================================================================================
-            //End HANNAH Get Details
-            //=======================================================================================
+        //=======================================================================================
+        //End HANNAH Get Details
+        //=======================================================================================
 
 
 
-            // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
-            private Employee GetEmployeeById(int id)
+
+
+
+        // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
+        private Employee GetEmployeeById(int id)
+        {
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"SELECT e.id, 
+                    cmd.CommandText = @"SELECT e.id, 
                                                e.firstname, 
                                                e.lastname,
                                                e.issupervisor,
@@ -329,147 +406,165 @@ namespace BangazonWorkforce.Controllers
                                                         LEFT JOIN EmployeeTraining et ON e.Id = et.EmployeeId
                                                         LEFT JOIN TrainingProgram tp ON tp.Id = et.TrainingProgramId
                                          WHERE  e.Id = @id;";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-                        SqlDataReader reader = cmd.ExecuteReader();
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-                        Employee employee = null;
+                    Employee employee = null;
 
-                        while (reader.Read())
+                    while (reader.Read())
+                    {
+                        employee = new Employee
                         {
-                            employee = new Employee
+                            Id = reader.GetInt32(reader.GetOrdinal("id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Department = new Department
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
+                                Name = reader.GetString(reader.GetOrdinal("departmentname")),
+                            }
+                        };
+
+                        //if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
+                        //{
+                        //    employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
+                        //    employee.TrainingProgram = new TrainingProgram
+                        //    {
+                        //        Id = reader.GetInt32(reader.GetOrdinal("id")),
+                        //        Name = reader.GetString(reader.GetOrdinal("name")),
+                        //        StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
+                        //    };
+                        //}
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
+                        {
+                            employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
+                            employee.TrainingProgram = new TrainingProgram
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                Department = new Department
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("departmentid")),
-                                    Name = reader.GetString(reader.GetOrdinal("departmentname")),
-                                }
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
                             };
-
-                            if (!reader.IsDBNull(reader.GetOrdinal("computerId")))
-                            {
-                                employee.Computer.Id = reader.GetInt32(reader.GetOrdinal("computerId"));
-                                employee.Computer = new Computer
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Make = reader.GetString(reader.GetOrdinal("make")),
-                                    Manufacturer = reader.GetString(reader.GetOrdinal("manufacturer"))
-                                };
-                            }
-
-                            if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
-                            {
-                                employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
-                                employee.TrainingProgram = new TrainingProgram
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                    Name = reader.GetString(reader.GetOrdinal("name")),
-                                    StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
-                                };
-                            }
-
                         }
 
-                        reader.Close();
-
-                        return (employee);
-
                     }
+
+                    reader.Close();
+
+                    return (employee);
+
                 }
             }
+        }
 
-            // JD - Wrote this for grabbing all instances of departments for employee views.
-            private List<Department> GetAllDepartments()
+
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+        // JD - Wrote this for grabbing all instances of departments for employee views.
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                    cmd.CommandText = @"SELECT id, name from Department;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> departments = new List<Department>();
+
+                    while (reader.Read())
                     {
-                        cmd.CommandText = @"SELECT id, name from Department;";
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                        List<Department> departments = new List<Department>();
-
-                        while (reader.Read())
+                        departments.Add(new Department
                         {
-                            departments.Add(new Department
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return departments;
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name"))
+                        });
                     }
-                }
-            }
 
-            private List<TrainingProgram> GetAllTrainingPrograms()
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"SELECT id, name from TrainingProgram;";
-                        SqlDataReader reader = cmd.ExecuteReader();
+                    reader.Close();
 
-                        List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
-
-                        while (reader.Read())
-                        {
-                            trainingPrograms.Add(new TrainingProgram()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Name = reader.GetString(reader.GetOrdinal("name"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return trainingPrograms;
-                    }
+                    return departments;
                 }
 
-            }
-
-
-            private List<Computer> GetAllComputers()
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"SELECT id, make from Computer;";
-                        SqlDataReader reader = cmd.ExecuteReader();
-
-                        List<Computer> computers = new List<Computer>();
-
-                        while (reader.Read())
-                        {
-                            computers.Add(new Computer()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                Make = reader.GetString(reader.GetOrdinal("make"))
-                            });
-                        }
-
-                        reader.Close();
-
-                        return computers;
-                    }
-                }
 
             }
         }
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+
+        private List<TrainingProgram> GetAllTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, name from TrainingProgram;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+
+                    while (reader.Read())
+                    {
+                        trainingPrograms.Add(new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("name"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return trainingPrograms;
+                }
+            }
+
+        }
+        //++++++++++++++++++End of JD' Code+++++++++++++++++++++++
+
+
+
+
+        //+++++++++++++ AUTHOR: JD Wheeler +++++++++++++++
+        private List<Computer> GetAllComputers()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT id, make from Computer;";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Computer> computers = new List<Computer>();
+
+                    while (reader.Read())
+                    {
+                        computers.Add(new Computer()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("make"))
+                        });
+                    }
+
+
+                    reader.Close();
+
+                    return computers;
+                }
+            }
+
+        }
+
+
     }
+
+}
+        
+    
+
 
 
