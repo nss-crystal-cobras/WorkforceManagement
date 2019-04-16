@@ -178,7 +178,6 @@ namespace BangazonWorkforce.Controllers
                     cmd.Parameters.Add(new SqlParameter("@lastname", viewModel.Employee.LastName));
                     cmd.Parameters.Add(new SqlParameter("@isSupervisor", viewModel.Employee.IsSupervisor));
                     cmd.Parameters.Add(new SqlParameter("@departmentId", viewModel.Employee.DepartmentId));
-                    cmd.Parameters.Add(new SqlParameter("@computerId", viewModel.Computer.Id));
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     cmd.ExecuteNonQuery();
@@ -187,16 +186,20 @@ namespace BangazonWorkforce.Controllers
                     cmd.CommandText = @"INSERT INTO employeeTraining (employeeId, trainingProgramId)
                                             VALUES ( @id, @trainingId );";
 
-                    foreach (var tpID in viewModel.SelectedTPs)
+                    if (viewModel.SelectedTPs != null)
                     {
-                        cmd.Parameters.Clear();
-                        cmd.Parameters.Add(new SqlParameter("@trainingId", tpID));
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        cmd.ExecuteNonQuery();
+                        foreach (var tpID in viewModel.SelectedTPs)
+                        {
+                            cmd.Parameters.Clear();
+                            cmd.Parameters.Add(new SqlParameter("@trainingId", tpID));
+                            cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                            cmd.ExecuteNonQuery();
+
+                        }
 
                     }
-
 
                     return RedirectToAction(nameof(Index));
                 }
@@ -379,7 +382,6 @@ namespace BangazonWorkforce.Controllers
 
 
 
-
         // JD created to grab individual items for editing. The edit requires ability to edit name, computer and training programs.
         private Employee GetEmployeeById(int id)
         {
@@ -437,17 +439,6 @@ namespace BangazonWorkforce.Controllers
                         //        StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
                         //    };
                         //}
-
-                        if (!reader.IsDBNull(reader.GetOrdinal("trainingProgramId")))
-                        {
-                            employee.TrainingProgram.Id = reader.GetInt32(reader.GetOrdinal("trainingProgramId"));
-                            employee.TrainingProgram = new TrainingProgram
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                StartDate = reader.GetDateTime(reader.GetOrdinal("startDate"))
-                            };
-                        }
 
                     }
 
