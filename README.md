@@ -56,6 +56,12 @@ and most powerful commercial platform for individuals all around the globe.
 ### Create
 - Author: Dan Brewer
 - User can create a new training program; creation form allows user to enter program title, start date, end date, and maximum number of employees
+### Details
+- Author: Hannah Neal
+- From the Training Programs list view, a user can select "details" for a given program to view the program name, start and end dates, max attendees and employees attending the program.
+### Edit
+- Author: Hannah Neal
+- From the Training Programs list or details views, a user can edit the name, start and end dates, and max attendees for a selected program from a pre-filled form. Saving the edits will return the user to the Training Programs list view.
 
 
 ## Technologies Used To Build This Application
