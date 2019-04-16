@@ -11,14 +11,20 @@ namespace BangazonWorkforce.Models
     public class TrainingProgram
     {
         public int Id { get; set; }
-        [Display (Name = "Program Name")]
+
+        [Display (Name = "Training Program:")]
         public string Name { get; set; }
-        [Display (Name = "Start Date")]
+
+        [Display (Name = "Training Program Start Date:")]
         public DateTime StartDate { get; set; }
-        [Display(Name = "End Date")]
+
+        [Display(Name = "Training Program End Date:")]
         public DateTime EndDate { get; set; }
-        [Display(Name = "Maximum Attendees")]
+
+        [Display(Name = "Max Seats Available/Max Attendees:")]
         public int MaxAttendees { get; set; }
+
+        public List<Employee> Employees { get; set; }
     }
 
 }

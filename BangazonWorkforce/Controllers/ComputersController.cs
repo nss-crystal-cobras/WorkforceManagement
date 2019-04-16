@@ -216,7 +216,6 @@ namespace BangazonWorkforce.Controllers
 
 
 
-
         private Computer GetComputerById(int id)
         {
             using (SqlConnection conn = Connection)
@@ -268,10 +267,5 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
-
-
-
-
-
     }
 }
