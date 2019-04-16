@@ -99,6 +99,7 @@ namespace BangazonWorkforce.Controllers
                     cmd.CommandText = @"
                         SELECT d.Id AS DepartmentId, 
                             d.[Name], 
+                            d.Budget,
                             e.Id AS EmployeeId, 
                             e.FirstName, 
                             e.LastName
@@ -120,6 +121,10 @@ namespace BangazonWorkforce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
+
+
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+
                             };
                         }
 
