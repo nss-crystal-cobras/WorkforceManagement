@@ -19,9 +19,11 @@ namespace BangazonWorkforce.Models
         [Required]
         public int Budget { get; set; }
 
+        //this property used in department details
         [Display(Name="Employees")]
         public List<Employee> EmployeeList { get; set; } = new List<Employee>();
 
+        //this property used in department index
         [Display(Name="Department Size")]
         public int EmployeeCount
         {

@@ -73,7 +73,6 @@ namespace BangazonWorkforce.Controllers
 
         //======= AUTHOR: ALLISON COLLINS ============
         // GET: Index of past training programs, accessible from link at bottom of index page of future training programs
-        // GET: TrainingPrograms
         public ActionResult PastIndex()
         {
             using (SqlConnection conn = Connection)
@@ -86,6 +85,7 @@ namespace BangazonWorkforce.Controllers
                                       FROM TrainingProgram;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
+                    //make list of past training programs
                     List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
 
                     /* set variable to timestamp here */
@@ -101,7 +101,7 @@ namespace BangazonWorkforce.Controllers
                             MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
                         };
 
-                        /* add if statement to check for enddate */
+                        //if current date is later than end of training program, add to list of trainingPrograms
                         if (CurrentDate > trainingProgram.EndDate)
                         {
                             trainingPrograms.Add(trainingProgram);
