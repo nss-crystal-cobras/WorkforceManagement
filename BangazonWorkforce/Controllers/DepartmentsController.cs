@@ -51,30 +51,36 @@ namespace BangazonWorkforce.Controllers
                                       LEFT JOIN Employee e on e.DepartmentId = DepartmentId;";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    //dictionary lets us add department id to newly created department
+                    //key: integer (DepartmentId), value: Department object
                     Dictionary<int, Department> departments = new Dictionary<int, Department>();
 
                     while (reader.Read())
                     {
+                        //reader looks for column name "DepartmentId" in database
                         int DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"));
 
-                        //why does this work? -> won't each department contain an Id no matter what?
+                        //DepartmentId has already been established as the key in the "departments" dictionary
+                        //following logic adds new department to dictionary if the dictionary doesn't yet contain the particular DepartmentId
                         if (!departments.ContainsKey(DepartmentId))
                         {
                             Department newDepartment = new Department
                             {
+                                //finding columns with following titles
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
 
+                            //build list of employees along with dept id
                             List<Employee> employees = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
 
+                            //EmployeeList defined in Department model; new department object given list of employees with same Id as long as at least 1 employee exists
                             if(employees.Count() > 0)
                             {
                                 newDepartment.EmployeeList = GetEmployeesByDepartmentId(reader.GetInt32(reader.GetOrdinal("DepartmentId")));
                             }
 
+                            //add key (DepartmentId) and value (newDepartment) to departments dictionary
                             departments.Add(DepartmentId, newDepartment);
                         }
                     }
@@ -87,7 +93,7 @@ namespace BangazonWorkforce.Controllers
         }
         // =================== GET: Departments/Details/5 ================================
         // header: dept name
-        // list of employees
+        // list of employees, budget
         public ActionResult Details(int id)
         {
             using (SqlConnection conn = Connection)
@@ -95,7 +101,6 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    //doesn't return any data at all while dept ID = 6
                     cmd.CommandText = @"
                         SELECT d.Id AS DepartmentId, 
                             d.[Name], 
@@ -121,10 +126,7 @@ namespace BangazonWorkforce.Controllers
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
-
-
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-
                             };
                         }
 
@@ -198,7 +200,9 @@ namespace BangazonWorkforce.Controllers
         }
         //============================= End of DB Code =======================================
 
-        //AC - use logic for Dept index
+        //ALLISON COLLINS - use logic for Dept index
+        // method gets employee Id, first and last name, connects DepartmentId in employee with corresponding Id in department
+        // returns list of employees
         private List<Employee> GetEmployeesByDepartmentId(int DepartmentId)
         {
             using (SqlConnection conn = Connection)
@@ -214,6 +218,7 @@ namespace BangazonWorkforce.Controllers
                         LEFT JOIN Department d on e.DepartmentId = d.id
                         WHERE e.DepartmentId = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", DepartmentId));
+                    //execute a command that returns rows
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Employee> employees = new List<Employee>();

@@ -71,6 +71,7 @@ namespace BangazonWorkforce.Controllers
         //================= AUTHOR: ALLISON COLLINS ======================
 
         // GET: Employees/Create
+        // view model allows for drop down menu with department options
         public ActionResult Create()
         {
             EmployeeCreateViewModel viewModel =
@@ -107,6 +108,7 @@ namespace BangazonWorkforce.Controllers
             }
             catch
             {
+                //GetAllDepartments method defined later in this controller
                 model.Departments = GetAllDepartments();
                 return View(model);
             }
