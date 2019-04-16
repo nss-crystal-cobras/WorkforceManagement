@@ -155,6 +155,8 @@ namespace BangazonWorkforce.Controllers
         // GET: Instructor/Delete/5
         public ActionResult Delete(int id)
         {
+            // Call GetTrainingProgramById for user to view the training program to be deleted
+
             TrainingProgram trainingProgram = GetTrainingProgramById(id);
             if (trainingProgram == null)
             {
@@ -167,6 +169,8 @@ namespace BangazonWorkforce.Controllers
         }
 
         // POST: Instructor/Delete/5
+        // Section to perform actual delete using SQL commands on database
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, TrainingProgram trainingProgram)
@@ -185,6 +189,7 @@ namespace BangazonWorkforce.Controllers
                 }
             }
         }
+        // Method to get Training Programs by their Id for use in other sections
 
         private TrainingProgram GetTrainingProgramById(int id)
         {
