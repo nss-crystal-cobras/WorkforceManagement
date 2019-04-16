@@ -1,0 +1,80 @@
+﻿@model BangazonWorkforce.Models.TrainingProgram
+
+@{
+    ViewData["Title"] = "GetTrainingProgramDetails";
+}
+
+<h1>GetTrainingProgramDetails</h1>
+
+<div>
+    <h4>TrainingProgram</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.StartDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StartDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EndDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EndDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MaxAttendees)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MaxAttendees)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Employees)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Employees)
+        </dd>
+
+        @*/*
+            HN: This loops over employees and displays all of the employees in the training program:
+        */*@
+
+        @if (Model.Employees.Count > 0)
+        {
+            <dt class="col-sm-4">
+                @Html.DisplayNameFor(model => model.Employees)
+            </dt>
+            <dd class="col-sm-10">
+                <dl>
+
+                    @foreach (var employee in Model.Employees)
+                    {
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(e => employee.FirstName)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(e => employee.FirstName)
+                        </dd>
+
+                        <dt class="col-sm-2">
+                            @Html.DisplayNameFor(e => employee.LastName)
+                        </dt>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(e => employee.LastName)
+                        </dd>
+                    }
+                </dl>
+            </dd>
+        }
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>
