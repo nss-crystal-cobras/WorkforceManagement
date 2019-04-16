@@ -193,11 +193,13 @@ namespace BangazonWorkforce.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id AS TrainingProgramId,
-                                               t.Name, t.StartDate, 
-                                               t.EndDate, t.MaxAttendees
-                                               FROM TrainingProgram t 
-                                               WHERE  Id = @id;";
+                    cmd.CommandText = @"SELECT tp.Id AS 'Training Program Id',
+                                               tp.[Name] AS 'Training Program Name', 
+                                               tp.StartDate AS 'Training Program Start', 
+                                               tp.EndDate AS 'Training Program End',
+                                               tp.MaxAttendees AS 'Max Attendees'
+                                               FROM TrainingProgram tp 
+                                               WHERE  tp.Id = @id;";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -207,11 +209,11 @@ namespace BangazonWorkforce.Controllers
                     {
                         trainingProgram = new TrainingProgram
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Training Program Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Training Program Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("Training Program Start")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("Training Program End")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("Max Attendees")),
                         };
                     }
 
@@ -328,8 +330,8 @@ namespace BangazonWorkforce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, TrainingProgram singleTrainingProgram)
         {
-            //try
-            //{
+            try
+            {
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
@@ -352,11 +354,11 @@ namespace BangazonWorkforce.Controllers
                         return RedirectToAction(nameof(Index));
                     }
                 }
-    //    }
-    //        catch
-    //        {
-    //            return View(trainingProgram);
-    //}
+        }
+            catch
+            {
+                return View(singleTrainingProgram);
+    }
 }
 
 
@@ -376,7 +378,7 @@ namespace BangazonWorkforce.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT 
-                                            tp.Id AS 'Training Program Id'
+                                            tp.Id AS 'Training Program Id',
                                             tp.[Name] AS 'Training Program Name', 
                                             tp.StartDate AS 'Training Program Start',
                                             tp.EndDate AS 'Training Program End', 
@@ -397,7 +399,7 @@ namespace BangazonWorkforce.Controllers
                         singleTrainingProgram = new TrainingProgram
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Training Program Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Training Program Name ")),
+                            Name = reader.GetString(reader.GetOrdinal("Training Program Name")),
                             StartDate = reader.GetDateTime(reader.GetOrdinal("Training Program Start")),
                             EndDate = reader.GetDateTime(reader.GetOrdinal("Training Program End")),
                             MaxAttendees = reader.GetInt32(reader.GetOrdinal("Max Attendees"))
